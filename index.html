@@ -17,7 +17,7 @@ header{text-align:center;padding:22px 14px 4px;}
 h1{margin:0;color:#fff;font-size:28px;font-weight:900;letter-spacing:.01em;text-transform:uppercase;}
 h1 .thin{display:block;font-size:13px;font-weight:600;letter-spacing:.16em;color:#bfe8d6;margin-top:7px;}
 nav{display:flex;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:5px;margin:16px 0 4px;position:sticky;top:8px;z-index:30;backdrop-filter:blur(8px);}
-nav button{flex:1;border:none;background:transparent;color:#cfe9dd;font-family:inherit;font-weight:800;font-size:13px;padding:11px 5px;border-radius:10px;cursor:pointer;transition:all .15s;}
+nav button{flex:1;border:none;background:transparent;color:#cfe9dd;font-family:inherit;font-weight:800;font-size:11.5px;padding:11px 3px;border-radius:10px;cursor:pointer;transition:all .15s;}
 nav button.active{background:var(--pick);color:var(--pickink);box-shadow:0 4px 12px rgba(0,194,122,.35);}
 .tab{display:none}.tab.active{display:block}
 .rodtabs{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 4px;}
@@ -45,7 +45,8 @@ nav button.active{background:var(--pick);color:var(--pickink);box-shadow:0 4px 1
 .win-badge{font-size:11px;text-align:center;color:var(--pick2);font-weight:800;margin-top:6px;min-height:14px;}
 .acertos{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
 .ac{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px;}
-.ac.hit{background:#E9F7F0;color:var(--pick2);}.ac.miss{background:#FBEAE7;color:#b23b2a;}.ac .who{font-weight:800;}
+.ac.hit{background:#E9F7F0;color:var(--pick2);}.ac.miss{background:#FBEAE7;color:#b23b2a;}.ac.neutral{background:#EEF1F4;color:#51607a;}.ac .who{font-weight:800;}
+.acertos.left{justify-content:flex-start;}
 .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:8px;margin:14px 0 16px;}
 .pod{background:var(--paper);border-radius:14px 14px 8px 8px;box-shadow:var(--shadow);padding:12px 6px 14px;text-align:center;position:relative;}
 .pod .medal{font-size:26px;}.pod .pname{font-weight:800;font-size:13px;margin:4px 0 2px;}.pod .ppts{font-size:12px;color:var(--muted);font-weight:700;}
@@ -102,11 +103,13 @@ footer{text-align:center;color:rgba(255,255,255,.45);font-size:11px;padding:18px
 <nav>
 <button data-tab="jogos" class="active">📊 Jogos</button>
 <button data-tab="ranking">🏆 Ranking</button>
-<button data-tab="palpitar">✍️ Palpitar</button>
+<button data-tab="palpitar">✍️ Votar</button>
+<button data-tab="palpites">👀 Palpites</button>
 </nav>
 <div id="jogos" class="tab active"><div class="loading">Carregando…</div></div>
 <div id="ranking" class="tab"><div class="loading">Carregando…</div></div>
 <div id="palpitar" class="tab"><div class="loading">Carregando…</div></div>
+<div id="palpites" class="tab"><div class="loading">Carregando…</div></div>
 <div id="admin" class="tab"></div>
 <footer>Bolão da galera · Copa 2026 · placares automáticos + ranking automático</footer>
 </div>
@@ -129,7 +132,7 @@ async function boot(){
       getJSON("dados/resultados.json").catch(()=>({resultados:{}})),
     ]);
     JOGOS=j.jogos; VOT=v.votos||{}; JOGADORES=v.jogadores||[]; RES=r.resultados||{};
-    renderJogos(); renderRanking(); renderPalpitar();
+    renderJogos(); renderRanking(); renderPalpitar(); renderPalpites();
   }catch(e){ $("#jogos").innerHTML='<div class="err">Não consegui carregar os dados de /dados. Confira se os arquivos estão lá.</div>'; }
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
@@ -255,6 +258,43 @@ function buildAdmin(){
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="resultados.json";document.body.appendChild(a);a.click();document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(a.href),3000);$("#admOk").classList.add('show');};
   $("#admExit").onclick=closeAdmin;
+}
+
+/* ---------- PALPITES (consultar o que cada um votou) ---------- */
+let pvModo='jogo', pvRod=null, pvPessoa=null;
+function pickLabel(j,p){return p==='C'?`${j.casa.flag} ${j.casa.nome}`:p==='F'?`${j.fora.flag} ${j.fora.nome}`:p==='E'?'🤝 Empate':'—';}
+function renderPalpites(){
+  if(!JOGADORES.length){$("#palpites").innerHTML='<div class="err">Sem votos carregados.</div>';return;}
+  const rods=rodadas();if(pvRod==null)pvRod=rods[0];
+  let html=`<div class="rodtabs"><button class="pv-modo ${pvModo==='jogo'?'active':''}" data-m="jogo">Por jogo</button><button class="pv-modo ${pvModo==='pessoa'?'active':''}" data-m="pessoa">Por pessoa</button></div>`;
+  if(pvModo==='jogo'){
+    html+='<div class="rodtabs">'+rods.map(r=>`<button data-r="${r}" class="${r==pvRod?'active':''}">Rodada ${r}</button>`).join('')+'</div>';
+    const lista=JOGOS.filter(j=>j.rodada==pvRod);let dia='';
+    lista.forEach(j=>{ if(j.data!==dia){dia=j.data;html+=`<div class="day"><span class="dot"></span><span class="d">${fmtDia(j.data)}</span><span class="line"></span></div>`;}
+      const out=outcome(resOf(j.id));const v=VOT[j.id]||{};
+      const chips=JOGADORES.map(n=>{const pk=v[n];const cls=out?(pk===out?'hit':'miss'):'neutral';return `<span class="ac ${cls}"><span class="who">${n}:</span> ${pickLabel(j,pk)}</span>`;}).join('');
+      html+=`<div class="match"><div class="match-top"><span class="grp">Grupo ${j.grupo}</span>${out?'<span class="st enc">com resultado</span>':'<span class="st pend">a jogar</span>'}</div>
+      <div class="teams" style="margin-bottom:9px"><div class="team"><span class="flag">${j.casa.flag}</span><span class="nm">${j.casa.nome}</span></div><div class="vs">×</div><div class="team"><span class="flag">${j.fora.flag}</span><span class="nm">${j.fora.nome}</span></div></div>
+      <div class="acertos left" style="border-top:1px dashed var(--line)">${chips}</div></div>`; });
+  } else {
+    if(pvPessoa==null)pvPessoa=JOGADORES[0];
+    html+='<div class="rodtabs">'+JOGADORES.map(n=>`<button data-p="${n}" class="${n==pvPessoa?'active':''}">${n}</button>`).join('')+'</div>';
+    let acertos=0,decididos=0;
+    rods.forEach(r=>{
+      html+=`<div class="day"><span class="dot"></span><span class="d">Rodada ${r}</span><span class="line"></span></div>`;
+      JOGOS.filter(j=>j.rodada==r).forEach(j=>{const v=(VOT[j.id]||{})[pvPessoa];const out=outcome(resOf(j.id));
+        const cls=out?(v===out?'hit':'miss'):'neutral';if(out){decididos++;if(v===out)acertos++;}
+        html+=`<div class="pgame" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:7px">
+          <div style="font-size:12px;font-weight:700;color:var(--ink)">${j.casa.nome} <span style="color:var(--muted)">×</span> ${j.fora.nome}</div>
+          <span class="ac ${cls}" style="white-space:nowrap">${pickLabel(j,v)}${out?(v===out?' ✓':' ✗'):''}</span></div>`;});
+    });
+    html=html.replace('__RESUMO__','');
+    html=`<div class="secnote" style="margin-top:6px"><b>${pvPessoa}</b> — ${acertos} acertos em ${decididos} jogos decididos</div>`+html;
+  }
+  $("#palpites").innerHTML=html;
+  document.querySelectorAll('#palpites .pv-modo').forEach(b=>b.onclick=()=>{pvModo=b.dataset.m;renderPalpites();});
+  document.querySelectorAll('#palpites .rodtabs button[data-r]').forEach(b=>b.onclick=()=>{pvRod=+b.dataset.r;renderPalpites();});
+  document.querySelectorAll('#palpites .rodtabs button[data-p]').forEach(b=>b.onclick=()=>{pvPessoa=b.dataset.p;renderPalpites();});
 }
 boot();
 </script></body></html>
