@@ -1,73 +1,116 @@
-// Busca os placares da Copa na API football-data.org e atualiza dados/resultados.json
-// Uso local:  FD_TOKEN=seu_token node scripts/atualizar-resultados.mjs
+// Busca placares na API football-data.org, atualiza dados/resultados.json
+// e, se entrou placar novo, gera mensagem.txt (pronta pro WhatsApp) p/ o e-mail.
+// Local:  FD_TOKEN=seu_token node scripts/atualizar-resultados.mjs
 import { readFile, writeFile } from "node:fs/promises";
 
 const TOKEN = process.env.FD_TOKEN;
-const COMP = process.env.FD_COMP || "WC";            // World Cup
-const JOGOS_PATH = "dados/jogos.json";
-const RES_PATH = "dados/resultados.json";
+const COMP = process.env.FD_COMP || "WC";
+const JOGOS_PATH="dados/jogos.json", RES_PATH="dados/resultados.json", VOT_PATH="dados/votos.json", MSG_PATH="mensagem.txt";
 
 const norm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
   .toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const nomesDoTime = t => [t.nome, ...(t.api||[])].map(norm);
 
-function nomesDoTime(t){ return [t.nome, ...(t.api||[])].map(norm); }
-
-// casa um jogo (jogos.json) com um match da API (em qualquer orientação)
-function casa(jogo, apiMatch){
-  const home = norm(apiMatch.homeTeam?.name), away = norm(apiMatch.awayTeam?.name);
-  const C = nomesDoTime(jogo.casa), F = nomesDoTime(jogo.fora);
-  if (C.includes(home) && F.includes(away)) return "normal";
-  if (C.includes(away) && F.includes(home)) return "invertido";
+function casa(jogo, m){
+  const home=norm(m.homeTeam?.name), away=norm(m.awayTeam?.name);
+  const C=nomesDoTime(jogo.casa), F=nomesDoTime(jogo.fora);
+  if (C.includes(home)&&F.includes(away)) return "normal";
+  if (C.includes(away)&&F.includes(home)) return "invertido";
   return null;
 }
-
-function statusDe(s){
-  if (["FINISHED","AWARDED"].includes(s)) return "encerrado";
-  if (["IN_PLAY","PAUSED","LIVE"].includes(s)) return "ao_vivo";
-  return null; // SCHEDULED/TIMED/etc -> ainda não tem placar
-}
+const statusDe = s => ["FINISHED","AWARDED"].includes(s) ? "encerrado"
+  : (["IN_PLAY","PAUSED","LIVE"].includes(s) ? "ao_vivo" : null);
 
 export function casarTudo(jogos, apiMatches){
-  const out = {};
+  const out={};
   for (const j of jogos){
     for (const m of apiMatches){
-      const ori = casa(j, m);
-      if (!ori) continue;
-      const st = statusDe(m.status);
-      if (!st) break; // achou o jogo mas ainda não começou
-      let casaG = m.score?.fullTime?.home, foraG = m.score?.fullTime?.away;
-      if (casaG==null || foraG==null) break;
-      if (ori==="invertido"){ const t=casaG; casaG=foraG; foraG=t; }
-      out[j.id] = { casa: casaG, fora: foraG, status: st, fonte: "api" };
-      break;
+      const ori=casa(j,m); if(!ori) continue;
+      const st=statusDe(m.status); if(!st) break;
+      let cg=m.score?.fullTime?.home, fg=m.score?.fullTime?.away;
+      if (cg==null||fg==null) break;
+      if (ori==="invertido"){ const t=cg; cg=fg; fg=t; }
+      out[j.id]={casa:cg,fora:fg,status:st,fonte:"api"}; break;
     }
   }
   return out;
 }
+const desfecho = r => r.casa>r.fora ? "C" : (r.casa<r.fora ? "F" : "E");
 
-async function main(){
-  if (!TOKEN){ console.error("Defina FD_TOKEN (token da football-data.org)."); process.exit(1); }
-  const jogos = JSON.parse(await readFile(JOGOS_PATH,"utf8")).jogos;
-  const resp = await fetch(`https://api.football-data.org/v4/competitions/${COMP}/matches`,
-    { headers: { "X-Auth-Token": TOKEN } });
-  if (!resp.ok){ console.error("API falhou:", resp.status, await resp.text()); process.exit(1); }
-  const data = await resp.json();
-  const apiMatches = data.matches || [];
-  console.log(`API retornou ${apiMatches.length} jogos.`);
-
-  const apiRes = casarTudo(jogos, apiMatches);
-
-  // mescla: mantém entradas manuais de jogos que a API ainda não cobriu
-  let atual = { resultados: {} };
-  try { atual = JSON.parse(await readFile(RES_PATH,"utf8")); } catch {}
-  const merged = { ...(atual.resultados||{}) };
-  for (const [id,v] of Object.entries(apiRes)) merged[id] = v; // API tem prioridade nos que ela cobre
-
-  const novo = { atualizado: new Date().toISOString(), resultados: merged };
-  const antigo = JSON.stringify(atual.resultados||{});
-  if (JSON.stringify(merged) === antigo){ console.log("Sem mudanças."); return; }
-  await writeFile(RES_PATH, JSON.stringify(novo,null,2)+"\n");
-  console.log(`Atualizado: ${Object.keys(apiRes).length} jogos casados na API; total ${Object.keys(merged).length}.`);
+export function ranking(jogos, votos, resultados){
+  const nomes = votos.jogadores;
+  const rods=[...new Set(jogos.map(j=>j.rodada))].sort((a,b)=>a-b);
+  const tab=nomes.map(n=>{const o={nome:n,rod:{},total:0};rods.forEach(r=>o.rod[r]=0);return o;});
+  for (const j of jogos){
+    const r=resultados[j.id]; if(!r) continue;
+    const d=desfecho(r); const v=votos.votos[j.id]||{};
+    tab.forEach(p=>{ if(v[p.nome]===d){p.rod[j.rodada]++;p.total++;} });
+  }
+  tab.sort((a,b)=>b.total-a.total||(b.rod[rods.at(-1)]||0)-(a.rod[rods.at(-1)]||0));
+  let pos=0,prev=null; tab.forEach((p,i)=>{ if(p.total!==prev){pos=i+1;prev=p.total;} p.pos=pos; });
+  return {tab,rods};
 }
 
+export function montarMensagem(jogos, votos, resultados, novos){
+  const byId=Object.fromEntries(jogos.map(j=>[j.id,j]));
+  const {tab,rods}=ranking(jogos,votos,resultados);
+  let L=[];
+  L.push("🏆 BOLÃO COPA 2026 — Atualização");
+  L.push("");
+  L.push("🆕 Últimos resultados:");
+  for (const id of novos){
+    const j=byId[id], r=resultados[id]; if(!j||!r) continue;
+    const d=desfecho(r);
+    const vencedor = d==="C"?`${j.casa.flag} ${j.casa.nome}`:d==="F"?`${j.fora.flag} ${j.fora.nome}`:"🤝 Empate";
+    const v=votos.votos[id]||{};
+    const acertaram=votos.jogadores.filter(n=>v[n]===d);
+    L.push(`• ${j.casa.nome} ${r.casa}x${r.fora} ${j.fora.nome}  →  ${vencedor}`);
+    L.push(`   ✅ ${acertaram.length?acertaram.join(", "):"ninguém"}`);
+  }
+  L.push("");
+  L.push("📊 Classificação geral:");
+  const medal=p=>p.pos===1?"🥇":p.pos===2?"🥈":p.pos===3?"🥉":`${p.pos}º`;
+  tab.forEach(p=>{ L.push(`${medal(p)} ${p.nome} — ${p.total} ${p.total===1?"acerto":"acertos"}`); });
+  L.push("");
+  L.push(`(R${rods.join(" / R")} já contam no total)`);
+  return L.join("\n");
+}
+
+async function main(){
+  if(!TOKEN){ console.error("Defina FD_TOKEN."); process.exit(1); }
+  const jogos=JSON.parse(await readFile(JOGOS_PATH,"utf8")).jogos;
+  const votos=JSON.parse(await readFile(VOT_PATH,"utf8"));
+  let atual={resultados:{}}; try{ atual=JSON.parse(await readFile(RES_PATH,"utf8")); }catch{}
+  const antes=atual.resultados||{};
+
+  const resp=await fetch(`https://api.football-data.org/v4/competitions/${COMP}/matches`,{headers:{"X-Auth-Token":TOKEN}});
+  if(!resp.ok){ console.error("API falhou:",resp.status,await resp.text()); process.exit(1); }
+  const apiMatches=(await resp.json()).matches||[];
+  console.log(`API retornou ${apiMatches.length} jogos.`);
+
+  const apiRes=casarTudo(jogos,apiMatches);
+  const merged={...antes};
+  for(const [id,v] of Object.entries(apiRes)) merged[id]=v;
+
+  // detecta jogos NOVOS/alterados (com placar)
+  // "novo" = mudou placar/status (ignora o campo 'fonte' pra não disparar e-mail à toa)
+  const sig = r => r ? `${r.casa}|${r.fora}|${r.status}` : "";
+  const novos=Object.keys(merged).filter(id => sig(antes[id]) !== sig(merged[id]));
+
+  const mudou = novos.length>0;
+  if(mudou){
+    await writeFile(RES_PATH, JSON.stringify({atualizado:new Date().toISOString(),resultados:merged},null,2)+"\n");
+    const msg=montarMensagem(jogos,votos,merged,novos);
+    const waLink="https://wa.me/?text="+encodeURIComponent(msg);
+    const corpo=msg+"\n\n———\n📲 Abrir direto no WhatsApp (mensagem já pronta):\n"+waLink+"\n";
+    await writeFile(MSG_PATH, corpo);
+    console.log(`Atualizado: ${novos.length} jogo(s) novo(s). Mensagem gerada.`);
+  } else {
+    console.log("Sem placar novo.");
+  }
+  // sinaliza pro workflow (quantidade de novos)
+  if(process.env.GITHUB_OUTPUT){
+    await writeFile(process.env.GITHUB_OUTPUT, `novos=${novos.length}\n`, {flag:"a"});
+  }
+}
 if (process.argv[1] && process.argv[1].endsWith("atualizar-resultados.mjs")) main();
