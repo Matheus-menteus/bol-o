@@ -186,12 +186,6 @@
       "fora": 1,
       "status": "encerrado",
       "fonte": "api"
-    },
-    "r2-05": {
-      "casa": 2,
-      "fora": 0,
-      "status": "encerrado",
-      "fonte": "api"
     }
   }
 }
