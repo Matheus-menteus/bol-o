@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-06-21T20:52:30.281Z",
+  "atualizado": "2026-06-21T22:15:10.706Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -226,7 +226,7 @@
     "r2-14": {
       "casa": 0,
       "fora": 0,
-      "status": "ao_vivo",
+      "status": "encerrado",
       "fonte": "api"
     }
   }
