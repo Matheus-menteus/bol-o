@@ -978,6 +978,494 @@
           "Congo DR"
         ]
       }
+    },
+    {
+      "id": "r3-01",
+      "rodada": 3,
+      "grupo": "B",
+      "data": "2026-06-24",
+      "casa": {
+        "nome": "Suíça",
+        "flag": "🇨🇭",
+        "api": [
+          "Switzerland"
+        ]
+      },
+      "fora": {
+        "nome": "Canadá",
+        "flag": "🇨🇦",
+        "api": [
+          "Canada"
+        ]
+      }
+    },
+    {
+      "id": "r3-02",
+      "rodada": 3,
+      "grupo": "B",
+      "data": "2026-06-24",
+      "casa": {
+        "nome": "Bósnia e Herz.",
+        "flag": "🇧🇦",
+        "api": [
+          "Bosnia and Herzegovina"
+        ]
+      },
+      "fora": {
+        "nome": "Catar",
+        "flag": "🇶🇦",
+        "api": [
+          "Qatar"
+        ]
+      }
+    },
+    {
+      "id": "r3-03",
+      "rodada": 3,
+      "grupo": "C",
+      "data": "2026-06-24",
+      "casa": {
+        "nome": "Escócia",
+        "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "api": [
+          "Scotland"
+        ]
+      },
+      "fora": {
+        "nome": "Brasil",
+        "flag": "🇧🇷",
+        "api": [
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "id": "r3-04",
+      "rodada": 3,
+      "grupo": "C",
+      "data": "2026-06-24",
+      "casa": {
+        "nome": "Marrocos",
+        "flag": "🇲🇦",
+        "api": [
+          "Morocco"
+        ]
+      },
+      "fora": {
+        "nome": "Haiti",
+        "flag": "🇭🇹",
+        "api": [
+          "Haiti"
+        ]
+      }
+    },
+    {
+      "id": "r3-05",
+      "rodada": 3,
+      "grupo": "A",
+      "data": "2026-06-24",
+      "casa": {
+        "nome": "Rep. Tcheca",
+        "flag": "🇨🇿",
+        "api": [
+          "Czechia",
+          "Czech Republic"
+        ]
+      },
+      "fora": {
+        "nome": "México",
+        "flag": "🇲🇽",
+        "api": [
+          "Mexico"
+        ]
+      }
+    },
+    {
+      "id": "r3-06",
+      "rodada": 3,
+      "grupo": "A",
+      "data": "2026-06-24",
+      "casa": {
+        "nome": "África do Sul",
+        "flag": "🇿🇦",
+        "api": [
+          "South Africa"
+        ]
+      },
+      "fora": {
+        "nome": "Coreia do Sul",
+        "flag": "🇰🇷",
+        "api": [
+          "Korea Republic",
+          "South Korea"
+        ]
+      }
+    },
+    {
+      "id": "r3-07",
+      "rodada": 3,
+      "grupo": "E",
+      "data": "2026-06-25",
+      "casa": {
+        "nome": "Curaçao",
+        "flag": "🇨🇼",
+        "api": [
+          "Curaçao",
+          "Curacao"
+        ]
+      },
+      "fora": {
+        "nome": "Costa do Marfim",
+        "flag": "🇨🇮",
+        "api": [
+          "Côte d'Ivoire",
+          "Ivory Coast"
+        ]
+      }
+    },
+    {
+      "id": "r3-08",
+      "rodada": 3,
+      "grupo": "E",
+      "data": "2026-06-25",
+      "casa": {
+        "nome": "Equador",
+        "flag": "🇪🇨",
+        "api": [
+          "Ecuador"
+        ]
+      },
+      "fora": {
+        "nome": "Alemanha",
+        "flag": "🇩🇪",
+        "api": [
+          "Germany"
+        ]
+      }
+    },
+    {
+      "id": "r3-09",
+      "rodada": 3,
+      "grupo": "F",
+      "data": "2026-06-25",
+      "casa": {
+        "nome": "Japão",
+        "flag": "🇯🇵",
+        "api": [
+          "Japan"
+        ]
+      },
+      "fora": {
+        "nome": "Suécia",
+        "flag": "🇸🇪",
+        "api": [
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "id": "r3-10",
+      "rodada": 3,
+      "grupo": "F",
+      "data": "2026-06-25",
+      "casa": {
+        "nome": "Tunísia",
+        "flag": "🇹🇳",
+        "api": [
+          "Tunisia"
+        ]
+      },
+      "fora": {
+        "nome": "Holanda",
+        "flag": "🇳🇱",
+        "api": [
+          "Netherlands"
+        ]
+      }
+    },
+    {
+      "id": "r3-11",
+      "rodada": 3,
+      "grupo": "D",
+      "data": "2026-06-25",
+      "casa": {
+        "nome": "Turquia",
+        "flag": "🇹🇷",
+        "api": [
+          "Türkiye",
+          "Turkey"
+        ]
+      },
+      "fora": {
+        "nome": "Estados Unidos",
+        "flag": "🇺🇸",
+        "api": [
+          "United States",
+          "USA"
+        ]
+      }
+    },
+    {
+      "id": "r3-12",
+      "rodada": 3,
+      "grupo": "D",
+      "data": "2026-06-25",
+      "casa": {
+        "nome": "Paraguai",
+        "flag": "🇵🇾",
+        "api": [
+          "Paraguay"
+        ]
+      },
+      "fora": {
+        "nome": "Austrália",
+        "flag": "🇦🇺",
+        "api": [
+          "Australia"
+        ]
+      }
+    },
+    {
+      "id": "r3-13",
+      "rodada": 3,
+      "grupo": "I",
+      "data": "2026-06-26",
+      "casa": {
+        "nome": "Noruega",
+        "flag": "🇳🇴",
+        "api": [
+          "Norway"
+        ]
+      },
+      "fora": {
+        "nome": "França",
+        "flag": "🇫🇷",
+        "api": [
+          "France"
+        ]
+      }
+    },
+    {
+      "id": "r3-14",
+      "rodada": 3,
+      "grupo": "I",
+      "data": "2026-06-26",
+      "casa": {
+        "nome": "Senegal",
+        "flag": "🇸🇳",
+        "api": [
+          "Senegal"
+        ]
+      },
+      "fora": {
+        "nome": "Iraque",
+        "flag": "🇮🇶",
+        "api": [
+          "Iraq"
+        ]
+      }
+    },
+    {
+      "id": "r3-15",
+      "rodada": 3,
+      "grupo": "H",
+      "data": "2026-06-26",
+      "casa": {
+        "nome": "Cabo Verde",
+        "flag": "🇨🇻",
+        "api": [
+          "Cape Verde",
+          "Cabo Verde"
+        ]
+      },
+      "fora": {
+        "nome": "Arábia Saudita",
+        "flag": "🇸🇦",
+        "api": [
+          "Saudi Arabia"
+        ]
+      }
+    },
+    {
+      "id": "r3-16",
+      "rodada": 3,
+      "grupo": "H",
+      "data": "2026-06-26",
+      "casa": {
+        "nome": "Uruguai",
+        "flag": "🇺🇾",
+        "api": [
+          "Uruguay"
+        ]
+      },
+      "fora": {
+        "nome": "Espanha",
+        "flag": "🇪🇸",
+        "api": [
+          "Spain"
+        ]
+      }
+    },
+    {
+      "id": "r3-17",
+      "rodada": 3,
+      "grupo": "G",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Egito",
+        "flag": "🇪🇬",
+        "api": [
+          "Egypt"
+        ]
+      },
+      "fora": {
+        "nome": "Irã",
+        "flag": "🇮🇷",
+        "api": [
+          "Iran"
+        ]
+      }
+    },
+    {
+      "id": "r3-18",
+      "rodada": 3,
+      "grupo": "G",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Nova Zelândia",
+        "flag": "🇳🇿",
+        "api": [
+          "New Zealand"
+        ]
+      },
+      "fora": {
+        "nome": "Bélgica",
+        "flag": "🇧🇪",
+        "api": [
+          "Belgium"
+        ]
+      }
+    },
+    {
+      "id": "r3-19",
+      "rodada": 3,
+      "grupo": "L",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Panamá",
+        "flag": "🇵🇦",
+        "api": [
+          "Panama"
+        ]
+      },
+      "fora": {
+        "nome": "Inglaterra",
+        "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+        "api": [
+          "England"
+        ]
+      }
+    },
+    {
+      "id": "r3-20",
+      "rodada": 3,
+      "grupo": "L",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Croácia",
+        "flag": "🇭🇷",
+        "api": [
+          "Croatia"
+        ]
+      },
+      "fora": {
+        "nome": "Gana",
+        "flag": "🇬🇭",
+        "api": [
+          "Ghana"
+        ]
+      }
+    },
+    {
+      "id": "r3-21",
+      "rodada": 3,
+      "grupo": "K",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Colômbia",
+        "flag": "🇨🇴",
+        "api": [
+          "Colombia"
+        ]
+      },
+      "fora": {
+        "nome": "Portugal",
+        "flag": "🇵🇹",
+        "api": [
+          "Portugal"
+        ]
+      }
+    },
+    {
+      "id": "r3-22",
+      "rodada": 3,
+      "grupo": "K",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "RD Congo",
+        "flag": "🇨🇩",
+        "api": [
+          "DR Congo",
+          "Congo DR"
+        ]
+      },
+      "fora": {
+        "nome": "Uzbequistão",
+        "flag": "🇺🇿",
+        "api": [
+          "Uzbekistan"
+        ]
+      }
+    },
+    {
+      "id": "r3-23",
+      "rodada": 3,
+      "grupo": "J",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Argélia",
+        "flag": "🇩🇿",
+        "api": [
+          "Algeria"
+        ]
+      },
+      "fora": {
+        "nome": "Áustria",
+        "flag": "🇦🇹",
+        "api": [
+          "Austria"
+        ]
+      }
+    },
+    {
+      "id": "r3-24",
+      "rodada": 3,
+      "grupo": "J",
+      "data": "2026-06-27",
+      "casa": {
+        "nome": "Jordânia",
+        "flag": "🇯🇴",
+        "api": [
+          "Jordan"
+        ]
+      },
+      "fora": {
+        "nome": "Argentina",
+        "flag": "🇦🇷",
+        "api": [
+          "Argentina"
+        ]
+      }
     }
   ]
 }
