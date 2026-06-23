@@ -291,9 +291,10 @@ function montar(){
   return `🎯 BOLÃO COPA 2026 — ${lbl}\n👤 ${nome}\n\n`+linhas.join('\n');}
 function enviar(){
   const perfilPlanilha=PERFIL||'Visitante';
+  const vulgo=VULGO||PERFIL||'';
   const lista=JOGOS.filter(j=>j.rodada==palpRod&&!resOf(j.id));
   const faltam=lista.filter(j=>!palpites[j.id]);const err=$("#perr");
-  if(!nome){err.textContent='Coloque seu nome antes de enviar.';return;}
+  if(!vulgo){err.textContent='Escolha seu perfil na tela inicial.';return;}
   if(!lista.length){err.textContent='Nenhum jogo em aberto nesta rodada.';return;}
   if(faltam.length){err.textContent=`Faltam ${faltam.length} palpite(s).`;return;}
   err.textContent='';
