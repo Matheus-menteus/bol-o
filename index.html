@@ -301,13 +301,15 @@ function enviar(){
   // 1) Abre WhatsApp com a mensagem bonitinha (como sempre)
   window.open('https://wa.me/?text='+encodeURIComponent(montar()),'_blank');
   // 2) Silenciosamente, salva na planilha via Apps Script (em segundo plano)
+  //    rodada vem dos jogos votados (não do palpRod), garantindo o número certo
+  const rodadaReal=Number(lista[0].rodada);
   if(APPS_SCRIPT_URL && PERFIL && PERFIL!=='Visitante'){
     const votosPayload={};
     lista.forEach(j=>{if(palpites[j.id])votosPayload[j.casa.nome+'|'+j.fora.nome]=palpites[j.id];});
     fetch(APPS_SCRIPT_URL,{
       method:'POST',
       headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({nome:perfilPlanilha,rodada:palpRod,votos:votosPayload})
+      body:JSON.stringify({nome:perfilPlanilha,rodada:rodadaReal,votos:votosPayload})
     }).then(r=>r.json()).then(d=>{
       if(d.ok) console.log('[Bolão] Votos salvos na planilha ✓');
       else console.warn('[Bolão] Aviso planilha:',d.msg);
