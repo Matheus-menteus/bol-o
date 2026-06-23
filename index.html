@@ -62,6 +62,7 @@ nav button.active{background:var(--pick);color:var(--pickink);box-shadow:0 4px 1
 .rk-note{color:#9fc3b5;font-size:11px;text-align:center;margin:14px 6px 0;line-height:1.5;}
 .field{margin:12px 0;}
 label.field-l{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#cfe9dd;font-weight:700;margin-bottom:6px;}
+.who-banner{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 13px;font-size:13px;color:#cfe9dd;margin-bottom:10px;}.who-banner b{color:var(--gold);}
 #pnome{width:100%;border:1.5px solid rgba(255,255,255,.2);border-radius:11px;padding:12px 13px;font-size:16px;color:var(--ink);background:#fff;font-family:inherit;}
 .pgame{background:var(--paper);border-radius:14px;box-shadow:var(--shadow);padding:12px;margin-bottom:10px;}
 .pgame .lab{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:700;}
@@ -264,7 +265,7 @@ let palpRod=null,palpites={};
 function renderPalpitar(){
   const rods=rodadas();if(palpRod==null)palpRod=rods[0];
   const nome=localStorage.getItem('bolao_nome')||'';
-  let html=`<div class="field"><label class="field-l" for="pnome">Seu nome</label><input id="pnome" type="text" placeholder="Como você aparece no ranking" value="${nome.replace(/"/g,'&quot;')}"></div>
+  let html=`<input id="pnome" type="hidden" value="${nome.replace(/"/g,'&quot;')}"><div class="who-banner">Votando como <b>${(VULGO||PERFIL||'?')}</b>${PERFIL&&PERFIL!=='Visitante'?' · '+PERFIL:''} · <span id="trocarPerfil" style="cursor:pointer;text-decoration:underline">trocar</span></div>
   <div class="rodtabs">`+rods.map(r=>`<button data-r="${r}" class="${r==palpRod?'active':''}">Rodada ${r}</button>`).join('')+`</div>
   <div class="secnote">Escolha o resultado de cada jogo em aberto. Os palpites vão pelo WhatsApp quando você tocar em enviar.</div>`;
   const lista=JOGOS.filter(j=>j.rodada==palpRod);let dia='';
@@ -276,7 +277,8 @@ function renderPalpitar(){
     <button data-j="${j.id}" data-v="F" class="${sel==='F'?'sel':''}" ${locked?'disabled':''}><span class="fl">${j.fora.flag}</span>${j.fora.nome}</button></div></div>`; });
   html+=`<div id="perr" class="err"></div><div class="send"><button class="cp" id="copiar">📋</button><button class="wa" id="enviar">📲 Enviar no WhatsApp</button></div>`;
   $("#palpitar").innerHTML=html;
-  $("#pnome").oninput=e=>{localStorage.setItem('bolao_nome',e.target.value);if(e.target.value.trim().toLowerCase()===SENHA)openAdmin();};
+  const tp=document.getElementById('trocarPerfil');
+  if(tp)tp.onclick=()=>{localStorage.removeItem('bolao_perfil');localStorage.removeItem('bolao_vulgo');location.reload();};
   document.querySelectorAll('#palpitar .opts button').forEach(b=>b.onclick=()=>{palpites[b.dataset.j]=b.dataset.v;renderPalpitar();});
   document.querySelectorAll('#palpitar .rodtabs button').forEach(b=>b.onclick=()=>{palpRod=+b.dataset.r;renderPalpitar();});
   $("#enviar").onclick=enviar;$("#copiar").onclick=()=>navigator.clipboard.writeText(montar()).then(()=>$("#copiar").textContent='✓');
