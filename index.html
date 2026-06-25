@@ -331,7 +331,7 @@ body { background-color: #050608; display: flex; justify-content: center; paddin
 <div class="cs-root">
 <div class="hud-head">
   <div class="hud-logo disp"><i class="ti ti-crosshair"></i>CS:MAJOR<span class="sub">// 7a0 DRAFT</span></div>
-  <div class="hud-status"><span class="dot"></span>SERVIDOR ATIVO<br><span id="hud-phase">DRAFT PHASE</span></div>
+  <div class="hud-status"><span class="dot"></span>SERVIDOR ATIVO <span style="color:var(--grn-dim)">v7</span><br><span id="hud-phase">DRAFT PHASE</span></div>
 </div>
 <div class="cs-pad">
 <div id="s-draft" class="screen active">
@@ -752,6 +752,8 @@ async function playSeriesLive(res,oppTeam,bo){
     if(elHalf)elHalf.textContent='';
   } finally {
     LIVE=false; // GARANTE que nunca trava, aconteça o que acontecer
+    // segunda garantia: se houver um callback de pós-partida pendente, dispara
+    if(typeof G._afterMatch==='function'){const cb=G._afterMatch;G._afterMatch=null;try{cb();}catch(e){console.error('afterMatch erro:',e);}}
   }
 }
 function stageLabel(bo){return bo===1?'BO1':(bo===3?'BO3':'BO5');}
@@ -780,17 +782,18 @@ async function resolveSwiss(oppId){
   if(LIVE)return;
   const opp=G.swiss[oppId]?G.swiss[oppId].team:{name:'Adversário',country:'🌍',rating:85,players:[]};
   const res=simSeries(G.myOvr,opp.rating,1);const won=res.won;
-  const sa=res.maps[0].mA,sb=res.maps[0].mB; // placar do mapa único
+  const sa=res.maps[0].mA,sb=res.maps[0].mB;
   const cont=document.getElementById('swiss-content');
   cont.innerHTML=`<div id="topslot"></div><div class="match-stage">Fase Suíça // BO1 // ${flag(opp.country)} ${opp.name}</div>${renderVeto(res,1)}${buildBoardShell(opp,'Fase Suíça',1)}<div class="btn-row" id="postmatch"></div>`;
-  await playSeriesLive(res,opp,1);
+
+  try{ await playSeriesLive(res,opp,1); }
+  catch(e){ console.error('Erro na animação (suíça):',e); LIVE=false; }
 
   const ps=G.swiss['myteam'];
   if(won){ps.wins++;G.swWins++;sfx.win();}else{ps.losses++;G.swLosses++;sfx.loss();}
   if(G.swiss[oppId]){if(won)G.swiss[oppId].losses++;else G.swiss[oppId].wins++;}
   G.swRound++;setPhase(`SUÍÇA ${ps.wins}V - ${ps.losses}D`);
-  // registra no histórico
-  G.history.push({stage:'Fase Suíça',bo:1,opp:opp.name,oppCountry:opp.country,won,score:won?`${sa}-${sb}`:`${sa}-${sb}`,scoreA:sa,scoreB:sb});
+  G.history.push({stage:'Fase Suíça',bo:1,opp:opp.name,oppCountry:opp.country,won,score:`${sa}-${sb}`,scoreA:sa,scoreB:sb});
 
   let bannerHtml='',btnHtml='';
   if(ps.wins>=3){bannerHtml=`<div class="res-banner win"><h2><i class="ti ti-trophy"></i> CLASSIFICADO</h2><p>Você avançou para os Playoffs (${ps.wins}V-${ps.losses}D)</p></div>`;btnHtml=`<button class="btn btn-p" onclick="startPlayoffs()">Avançar aos Playoffs <i class="ti ti-arrow-right"></i></button>`;if(CFG.mode==='auto')setTimeout(()=>{if(!LIVE)startPlayoffs();},SPEEDS[CFG.speed]*4);}
@@ -839,7 +842,9 @@ async function resolvePO(oppId,stageName,stageKey){
   const res=simSeries(G.myOvr,opp.rating,need);const won=res.won;
   const cont=document.getElementById('playoffs-content');
   cont.innerHTML=`<div id="topslot"></div><div class="match-stage">${stageName} // ${isFinal?'BO5':'BO3'} // ${flag(opp.country)} ${opp.name}</div>${renderVeto(res,bo)}${buildBoardShell(opp,stageName,bo)}<div class="btn-row" id="postmatch"></div>`;
-  await playSeriesLive(res,opp,bo);
+
+  try{ await playSeriesLive(res,opp,bo); }
+  catch(e){ console.error('Erro na animação (playoffs):',e); LIVE=false; }
 
   // registra histórico (placar da série em mapas)
   G.history.push({stage:stageName,bo,opp:opp.name,oppCountry:opp.country,won,score:`${res.wA}-${res.wB}`,scoreA:res.wA,scoreB:res.wB,maps:res.maps.map(m=>({name:m.mapName,a:m.mA,b:m.mB,ot:m.ot,won:m.winner==='A'}))});
@@ -852,7 +857,6 @@ async function resolvePO(oppId,stageName,stageKey){
     if(!next[stageKey]){bannerHtml=`<div class="res-banner win"><h2><i class="ti ti-trophy"></i> CAMPEÃO DO MAJOR</h2><p>Sua lineup conquistou o título! GGWP 🏆</p></div>`;btnHtml=`<button class="btn btn-p" onclick="showCampaignEnd(true)"><i class="ti ti-list"></i> Ver Resumo da Campanha</button>`;}
     else{bannerHtml=`<div class="res-banner win"><h2><i class="ti ti-check"></i> VITÓRIA</h2><p>Avançou para a ${next[stageKey].n} (${res.wA}-${res.wB})</p></div>`;btnHtml=`<button class="btn btn-p" onclick="renderPO('${next[stageKey].n}','${next[stageKey].k}')">Avançar para ${next[stageKey].n} <i class="ti ti-arrow-right"></i></button>`;if(CFG.mode==='auto')setTimeout(()=>{if(!LIVE)renderPO(next[stageKey].n,next[stageKey].k);},SPEEDS[CFG.speed]*4);}
   }
-  const top=document.getElementById('topslot');
   injectButtons('playoffs-content',bannerHtml,btnHtml,CFG.mode==='manual');
 }
 
