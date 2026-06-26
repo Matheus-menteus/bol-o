@@ -134,6 +134,27 @@ footer{text-align:center;color:rgba(255,255,255,.45);font-size:11px;padding:18px
   font-family:inherit;}
 .wlc-admin:hover{color:rgba(255,255,255,.6);}
 .hidden{display:none!important;}
+
+/* ---- Mata-Mata: votação de placar ---- */
+.pgame.mm{padding-bottom:10px;}
+.mm-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0;}
+.mm-team{flex:1;font-size:13px;font-weight:600;color:#eafaf3;display:flex;align-items:center;gap:5px;}
+.mm-team .fl{font-size:18px;}
+.mm-team-r{justify-content:flex-end;text-align:right;}
+.mm-score{display:flex;align-items:center;gap:6px;}
+.mm-g{width:46px;height:46px;text-align:center;font-size:20px;font-weight:800;border-radius:10px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;-moz-appearance:textfield;}
+.mm-g::-webkit-outer-spin-button,.mm-g::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.mm-g:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.18);}
+.mm-x{font-size:16px;color:#9fd9c4;font-weight:700;}
+.mm-quick{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:6px;}
+.mm-q{font-size:12px;padding:5px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#cfe9dd;cursor:pointer;}
+.mm-q:hover{background:rgba(255,255,255,.12);}
+.mm-q.qa{background:var(--gold);color:#1a3c34;border-color:var(--gold);font-weight:700;}
+.mm-pen{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px;padding:8px;background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.3);border-radius:9px;}
+.mm-pen-l{font-size:12px;font-weight:700;color:#f7c873;width:100%;}
+.mm-penbtn{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#eafaf3;cursor:pointer;}
+.mm-penbtn.sel{background:var(--gold);color:#1a3c34;border-color:var(--gold);font-weight:700;}
+
 </style></head><body>
 
 <div id="welcome">
@@ -185,8 +206,91 @@ async function getJSON(p){const r=await fetch(p+"?v="+Date.now());if(!r.ok)throw
 const MES=['','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 function fmtDia(iso){const [y,m,d]=iso.split('-');return `${d}/${MES[+m]}`;}
 function rodadas(){return [...new Set(JOGOS.map(j=>j.rodada))].sort((a,b)=>a-b);}
+function ehMataMata(rod){return rod>=4;}
+function nomeRodada(rod){return rod<=3?('Rodada '+rod):(rod===4?'Rodada de 32':rod===5?'Oitavas':rod===6?'Quartas':rod===7?'Semis':rod===8?'Final':'Mata-Mata');}
+function vencedorPalpite(p){ // do palpite de placar, quem a pessoa acha que passa
+  if(!p||p.gc==null||p.gf==null)return null;
+  if(p.gc>p.gf)return 'C'; if(p.gf>p.gc)return 'F';
+  return p.pen||null; // empate: depende do pênalti escolhido
+}
 function resOf(id){return RES[id]||null;}
 function outcome(r){if(!r)return null;if(r.casa>r.fora)return'C';if(r.casa<r.fora)return'F';return'E';}
+
+/* ====== CRUZAMENTO AUTOMÁTICO DO MATA-MATA ====== */
+// Mapa oficial FIFA 2026: qual partida alimenta qual (por número oficial 73-104)
+const BRACKET = {"oitavas": {"89": [74, 77], "90": [73, 75], "91": [76, 78], "92": [79, 80], "93": [81, 82], "94": [83, 84], "95": [86, 88], "96": [85, 87]}, "quartas": {"97": [89, 90], "98": [93, 94], "99": [91, 92], "100": [95, 96]}, "semis": {"101": [97, 98], "102": [99, 100]}, "final": {"104": [101, 102]}, "terceiro": {"103": [101, 102]}};
+// fase -> rodada interna do site
+const FASE_RODADA = {oitavas:5, quartas:6, semis:7, final:8, terceiro:8};
+// quantos jogos cada fase-origem precisa ter terminado pra liberar a próxima
+const ORIGEM_FASE = {oitavas:'r32', quartas:'oitavas', semis:'quartas', final:'semis', terceiro:'semis'};
+
+// retorna o vencedor (nome do time) de um jogo de mata-mata pelo seu resultado
+function vencedorJogo(jogo){
+  const r = RES[jogo.id];
+  if(!r) return null;
+  // se o resultado traz o vencedor explícito (do robô/API), usa ele
+  if(r.vencedor){ return r.vencedor; }
+  // senão calcula: gols normais; se empate, pênaltis
+  if(r.casa>r.fora) return jogo.casa.nome;
+  if(r.fora>r.casa) return jogo.fora.nome;
+  // empate no tempo normal -> precisa do pênalti
+  if(r.pen==='C') return jogo.casa.nome;
+  if(r.pen==='F') return jogo.fora.nome;
+  return null; // empate sem info de pênalti ainda
+}
+
+// acha o objeto-jogo pelo número oficial da partida
+function jogoPorNum(num){ return JOGOS.find(j=>String(j.num)===String(num)); }
+
+// monta dinamicamente os confrontos das fases seguintes a partir dos resultados
+function montarFasesSeguintes(){
+  // só monta uma fase se TODOS os jogos da fase de origem terminaram
+  const fasesOrdem = ['oitavas','quartas','semis','final','terceiro'];
+  fasesOrdem.forEach(fase=>{
+    const pares = BRACKET[fase];
+    Object.keys(pares).forEach(num=>{
+      const [a,b] = pares[num];
+      const ja = jogoPorNum(a), jb = jogoPorNum(b);
+      if(!ja||!jb) return; // jogos de origem ainda não existem
+      const va = vencedorJogo(ja), vb = vencedorJogo(jb);
+      // criar/atualizar o jogo desta fase (mesmo que "a definir")
+      let jogo = JOGOS.find(j=>String(j.num)===String(num));
+      if(!jogo){
+        jogo = {id:'mm-'+num, num:Number(num), rodada:FASE_RODADA[fase], fase:fase, data:null,
+                casa:{nome:'A definir',flag:'⬜',api:[]}, fora:{nome:'A definir',flag:'⬜',api:[]}};
+        JOGOS.push(jogo);
+      }
+      // 3º lugar usa os PERDEDORES das semis
+      if(fase==='terceiro'){
+        jogo.casa = va? perdedorJogo(ja):{nome:'A definir',flag:'⬜',api:[]};
+        jogo.fora = vb? perdedorJogo(jb):{nome:'A definir',flag:'⬜',api:[]};
+      } else {
+        if(va) jogo.casa = times(ja, va);
+        if(vb) jogo.fora = times(jb, vb);
+      }
+    });
+  });
+}
+function times(jogoOrigem, nomeVencedor){
+  return (jogoOrigem.casa.nome===nomeVencedor)?jogoOrigem.casa:jogoOrigem.fora;
+}
+function perdedorJogo(jogo){
+  const v = vencedorJogo(jogo); if(!v) return {nome:'A definir',flag:'⬜',api:[]};
+  return (jogo.casa.nome===v)?jogo.fora:jogo.casa;
+}
+// uma fase está "liberada pra votar" quando TODOS os jogos da fase de origem terminaram
+function faseliberada(rod){
+  if(rod<=4) return true; // grupos e R32 sempre liberadas
+  const faseNome = Object.keys(FASE_RODADA).find(f=>FASE_RODADA[f]===rod && f!=='terceiro');
+  if(!faseNome) return true;
+  const origem = ORIGEM_FASE[faseNome];
+  let jogosOrigem;
+  if(origem==='r32') jogosOrigem = JOGOS.filter(j=>j.rodada===4);
+  else jogosOrigem = JOGOS.filter(j=>j.fase===origem);
+  if(!jogosOrigem.length) return false;
+  return jogosOrigem.every(j=>!!RES[j.id]); // todos com resultado
+}
+
 
 async function boot(){
   try{
@@ -196,6 +300,7 @@ async function boot(){
       getJSON("dados/resultados.json").catch(()=>({resultados:{}})),
     ]);
     JOGOS=j.jogos; VOT=v.votos||{}; JOGADORES=v.jogadores||[]; RES=r.resultados||{};
+    montarFasesSeguintes();
     renderJogos(); renderRanking(); renderPalpitar(); renderPalpites();
   }catch(e){ $("#jogos").innerHTML='<div class="err">Não consegui carregar os dados de /dados. Confira se os arquivos estão lá.</div>'; }
 }
@@ -265,55 +370,139 @@ let palpRod=null,palpites={};
 function renderPalpitar(){
   const rods=rodadas();if(palpRod==null)palpRod=rods[0];
   const nome=localStorage.getItem('bolao_nome')||'';
+  const mm=ehMataMata(palpRod);
+  const liberada = faseliberada(palpRod);
   let html=`<input id="pnome" type="hidden" value="${nome.replace(/"/g,'&quot;')}"><div class="who-banner">Votando como <b>${(VULGO||PERFIL||'?')}</b>${PERFIL&&PERFIL!=='Visitante'?' · '+PERFIL:''} · <span id="trocarPerfil" style="cursor:pointer;text-decoration:underline">trocar</span></div>
-  <div class="rodtabs">`+rods.map(r=>`<button data-r="${r}" class="${r==palpRod?'active':''}">Rodada ${r}</button>`).join('')+`</div>
-  <div class="secnote">Escolha o resultado de cada jogo em aberto. Os palpites vão pelo WhatsApp quando você tocar em enviar.</div>`;
-  const lista=JOGOS.filter(j=>j.rodada==palpRod);let dia='';
-  lista.forEach(j=>{ if(j.data!==dia){dia=j.data;html+=`<div class="day"><span class="dot"></span><span class="d">${fmtDia(j.data)}</span><span class="line"></span></div>`;}
-    const locked=!!resOf(j.id);const sel=palpites[j.id];
-    html+=`<div class="pgame"><div class="lab">Grupo ${j.grupo} · ${j.casa.nome} × ${j.fora.nome}${locked?' · (encerrado)':''}</div>
-    <div class="opts"><button data-j="${j.id}" data-v="C" class="${sel==='C'?'sel':''}" ${locked?'disabled':''}><span class="fl">${j.casa.flag}</span>${j.casa.nome}</button>
-    <button data-j="${j.id}" data-v="E" class="${sel==='E'?'sel':''}" ${locked?'disabled':''}><span class="fl">🤝</span>Empate</button>
-    <button data-j="${j.id}" data-v="F" class="${sel==='F'?'sel':''}" ${locked?'disabled':''}><span class="fl">${j.fora.flag}</span>${j.fora.nome}</button></div></div>`; });
+  <div class="rodtabs">`+rods.map(r=>`<button data-r="${r}" class="${r==palpRod?'active':''}">${nomeRodada(r)}</button>`).join('')+`</div>`;
+  if(mm && !liberada){
+    html+=`<div class="secnote" style="text-align:center;padding:30px 16px;">⏳ A votação desta fase abre quando a fase anterior terminar. Volte depois que os jogos da fase anterior forem concluídos!</div>`;
+    $("#palpitar").innerHTML=html;
+    document.querySelectorAll('#palpitar .rodtabs button').forEach(b=>b.onclick=()=>{palpRod=+b.dataset.r;renderPalpitar();});
+    const tp0=document.getElementById('trocarPerfil');
+    if(tp0)tp0.onclick=()=>{localStorage.removeItem('bolao_perfil');localStorage.removeItem('bolao_vulgo');location.reload();};
+    return;
+  }
+  if(mm){
+    html+=`<div class="secnote">Monte o placar de cada jogo. Se você apostar em empate, escolha quem passa nos pênaltis. Os palpites vão pelo WhatsApp quando você enviar.</div>`;
+    const lista=JOGOS.filter(j=>j.rodada==palpRod);let dia='';
+    lista.forEach(j=>{ if(j.data&&j.data!==dia){dia=j.data;html+=`<div class="day"><span class="dot"></span><span class="d">${fmtDia(j.data)}</span><span class="line"></span></div>`;}
+      const locked=!!resOf(j.id);const p=palpites[j.id]||{};
+      const gc=(p.gc!=null?p.gc:''); const gf=(p.gf!=null?p.gf:'');
+      const empate=(gc!==''&&gf!==''&&Number(gc)===Number(gf));
+      html+=`<div class="pgame mm" data-j="${j.id}"><div class="lab">${j.casa.nome} × ${j.fora.nome}${locked?' · (encerrado)':''}</div>
+      <div class="mm-row">
+        <div class="mm-team"><span class="fl">${j.casa.flag}</span>${j.casa.nome}</div>
+        <div class="mm-score">
+          <input type="number" min="0" max="20" class="mm-g" data-j="${j.id}" data-side="gc" value="${gc}" ${locked?'disabled':''} inputmode="numeric">
+          <span class="mm-x">×</span>
+          <input type="number" min="0" max="20" class="mm-g" data-j="${j.id}" data-side="gf" value="${gf}" ${locked?'disabled':''} inputmode="numeric">
+        </div>
+        <div class="mm-team mm-team-r">${j.fora.nome}<span class="fl">${j.fora.flag}</span></div>
+      </div>
+      <div class="mm-quick">`+[ '1-0','2-0','2-1','3-0','3-1','0-0','1-1','2-2','0-1','0-2','1-2','1-3' ].map(q=>{const[a,b]=q.split('-');const act=(String(gc)===a&&String(gf)===b)?'qa':'';return `<button class="mm-q ${act}" data-j="${j.id}" data-gc="${a}" data-gf="${b}" ${locked?'disabled':''}>${a}×${b}</button>`;}).join('')+`</div>`;
+      if(empate){
+        const penSel=p.pen||'';
+        html+=`<div class="mm-pen"><span class="mm-pen-l">🥅 Quem passa nos pênaltis?</span>
+        <button class="mm-penbtn ${penSel==='C'?'sel':''}" data-j="${j.id}" data-pen="C" ${locked?'disabled':''}>${j.casa.flag} ${j.casa.nome}</button>
+        <button class="mm-penbtn ${penSel==='F'?'sel':''}" data-j="${j.id}" data-pen="F" ${locked?'disabled':''}>${j.fora.flag} ${j.fora.nome}</button></div>`;
+      }
+      html+=`</div>`;
+    });
+  } else {
+    html+=`<div class="secnote">Escolha o resultado de cada jogo em aberto. Os palpites vão pelo WhatsApp quando você tocar em enviar.</div>`;
+    const lista=JOGOS.filter(j=>j.rodada==palpRod);let dia='';
+    lista.forEach(j=>{ if(j.data!==dia){dia=j.data;html+=`<div class="day"><span class="dot"></span><span class="d">${fmtDia(j.data)}</span><span class="line"></span></div>`;}
+      const locked=!!resOf(j.id);const sel=palpites[j.id];
+      html+=`<div class="pgame"><div class="lab">Grupo ${j.grupo} · ${j.casa.nome} × ${j.fora.nome}${locked?' · (encerrado)':''}</div>
+      <div class="opts"><button data-j="${j.id}" data-v="C" class="${sel==='C'?'sel':''}" ${locked?'disabled':''}><span class="fl">${j.casa.flag}</span>${j.casa.nome}</button>
+      <button data-j="${j.id}" data-v="E" class="${sel==='E'?'sel':''}" ${locked?'disabled':''}><span class="fl">🤝</span>Empate</button>
+      <button data-j="${j.id}" data-v="F" class="${sel==='F'?'sel':''}" ${locked?'disabled':''}><span class="fl">${j.fora.flag}</span>${j.fora.nome}</button></div></div>`; });
+  }
   html+=`<div id="perr" class="err"></div><div class="send"><button class="cp" id="copiar">📋</button><button class="wa" id="enviar">📲 Enviar no WhatsApp</button></div>`;
   $("#palpitar").innerHTML=html;
   const tp=document.getElementById('trocarPerfil');
   if(tp)tp.onclick=()=>{localStorage.removeItem('bolao_perfil');localStorage.removeItem('bolao_vulgo');location.reload();};
+  // grupos: botões 1/X/2
   document.querySelectorAll('#palpitar .opts button').forEach(b=>b.onclick=()=>{palpites[b.dataset.j]=b.dataset.v;renderPalpitar();});
+  // mata-mata: inputs de gols
+  document.querySelectorAll('#palpitar .mm-g').forEach(inp=>inp.oninput=()=>{
+    const id=inp.dataset.j;const side=inp.dataset.side;const p=palpites[id]||{};
+    let val=inp.value===''?null:Math.max(0,Math.min(20,parseInt(inp.value)||0));
+    p[side]=val; palpites[id]={...p};
+    // se deixou de ser empate, limpa o pênalti
+    if(!(p.gc!=null&&p.gf!=null&&p.gc===p.gf))p.pen='';
+    renderPalpitar();
+  });
+  // mata-mata: botões de placar rápido
+  document.querySelectorAll('#palpitar .mm-q').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.j;const p=palpites[id]||{};
+    p.gc=parseInt(b.dataset.gc);p.gf=parseInt(b.dataset.gf);
+    if(p.gc!==p.gf)p.pen='';
+    palpites[id]={...p};renderPalpitar();
+  });
+  // mata-mata: botões de pênalti
+  document.querySelectorAll('#palpitar .mm-penbtn').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.j;const p=palpites[id]||{};p.pen=b.dataset.pen;palpites[id]={...p};renderPalpitar();
+  });
   document.querySelectorAll('#palpitar .rodtabs button').forEach(b=>b.onclick=()=>{palpRod=+b.dataset.r;renderPalpitar();});
   $("#enviar").onclick=enviar;$("#copiar").onclick=()=>navigator.clipboard.writeText(montar()).then(()=>$("#copiar").textContent='✓');
 }
 function montar(){
   const nome=VULGO||($("#pnome").value||'').trim()||(PERFIL||'?');
-  const lbl=palpRod===1?'Rodada 1':palpRod===2?'Rodada 2':'Rodada 3';
+  const mm=ehMataMata(palpRod);
+  const lbl=nomeRodada(palpRod);
+  if(mm){
+    const lista=JOGOS.filter(j=>j.rodada==palpRod&&!resOf(j.id));
+    let linhas=lista.map(j=>{const p=palpites[j.id]||{};
+      if(p.gc==null||p.gf==null)return `${j.casa.nome} x ${j.fora.nome}: —`;
+      let s=`${j.casa.nome} ${p.gc} x ${p.gf} ${j.fora.nome}`;
+      if(p.gc===p.gf&&p.pen){const q=p.pen==='C'?j.casa.nome:j.fora.nome;s+=` (passa: ${q})`;}
+      return s;});
+    return `🏆 BOLÃO COPA 2026 — ${lbl}\n👤 ${nome}\n\n`+linhas.join('\n');
+  }
   const lista=JOGOS.filter(j=>j.rodada==palpRod&&!resOf(j.id));
   let linhas=lista.map(j=>{const v=palpites[j.id];const r=v==='C'?`${j.casa.flag} ${j.casa.nome}`:v==='F'?`${j.fora.flag} ${j.fora.nome}`:v==='E'?'🤝 Empate':'—';return `${j.casa.nome} x ${j.fora.nome}: ${r}`;});
   return `🎯 BOLÃO COPA 2026 — ${lbl}\n👤 ${nome}\n\n`+linhas.join('\n');}
 function enviar(){
   const perfilPlanilha=PERFIL||'Visitante';
   const vulgo=VULGO||PERFIL||'';
+  const mm=ehMataMata(palpRod);
   const lista=JOGOS.filter(j=>j.rodada==palpRod&&!resOf(j.id));
-  const faltam=lista.filter(j=>!palpites[j.id]);const err=$("#perr");
+  const err=$("#perr");
   if(!vulgo){err.textContent='Escolha seu perfil na tela inicial.';return;}
   if(!lista.length){err.textContent='Nenhum jogo em aberto nesta rodada.';return;}
+  if(mm){
+    // validar: cada jogo precisa de gc e gf; se empate, precisa de pênalti
+    const faltam=lista.filter(j=>{const p=palpites[j.id]||{};return p.gc==null||p.gf==null;});
+    if(faltam.length){err.textContent=`Faltam ${faltam.length} placar(es).`;return;}
+    const faltaPen=lista.filter(j=>{const p=palpites[j.id]||{};return p.gc===p.gf&&!p.pen;});
+    if(faltaPen.length){err.textContent=`Em ${faltaPen.length} jogo(s) que você apostou empate, escolha quem passa nos pênaltis.`;return;}
+    err.textContent='';
+    window.open('https://wa.me/?text='+encodeURIComponent(montar()),'_blank');
+    const rodadaReal=Number(lista[0].rodada);
+    if(APPS_SCRIPT_URL && PERFIL && PERFIL!=='Visitante'){
+      const votosPayload={};
+      lista.forEach(j=>{const p=palpites[j.id];if(p&&p.gc!=null&&p.gf!=null){
+        votosPayload[j.casa.nome+'|'+j.fora.nome]={gc:p.gc,gf:p.gf,pen:(p.gc===p.gf?(p.pen||''):'')};
+      }});
+      fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({nome:perfilPlanilha,rodada:rodadaReal,tipo:'mm',votos:votosPayload})
+      }).then(r=>r.json()).then(d=>{if(d.ok)console.log('[Bolão] MM salvo ✓');else console.warn('[Bolão]',d.msg);}).catch(()=>{});
+    }
+    return;
+  }
+  // ---- grupos (1/X/2) ----
+  const faltam=lista.filter(j=>!palpites[j.id]);
   if(faltam.length){err.textContent=`Faltam ${faltam.length} palpite(s).`;return;}
   err.textContent='';
-  // 1) Abre WhatsApp com a mensagem bonitinha (como sempre)
   window.open('https://wa.me/?text='+encodeURIComponent(montar()),'_blank');
-  // 2) Silenciosamente, salva na planilha via Apps Script (em segundo plano)
-  //    rodada vem dos jogos votados (não do palpRod), garantindo o número certo
   const rodadaReal=Number(lista[0].rodada);
   if(APPS_SCRIPT_URL && PERFIL && PERFIL!=='Visitante'){
     const votosPayload={};
     lista.forEach(j=>{if(palpites[j.id])votosPayload[j.casa.nome+'|'+j.fora.nome]=palpites[j.id];});
-    fetch(APPS_SCRIPT_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain'},
+    fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({nome:perfilPlanilha,rodada:rodadaReal,votos:votosPayload})
-    }).then(r=>r.json()).then(d=>{
-      if(d.ok) console.log('[Bolão] Votos salvos na planilha ✓');
-      else console.warn('[Bolão] Aviso planilha:',d.msg);
-    }).catch(()=>{}); // falha silenciosa — WhatsApp já foi, não bloqueia ninguém
+    }).then(r=>r.json()).then(d=>{if(d.ok)console.log('[Bolão] Votos salvos ✓');else console.warn('[Bolão]',d.msg);}).catch(()=>{});
   }
 }
 
