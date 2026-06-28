@@ -135,26 +135,31 @@ footer{text-align:center;color:rgba(255,255,255,.45);font-size:11px;padding:18px
 .wlc-admin:hover{color:rgba(255,255,255,.6);}
 .hidden{display:none!important;}
 
-/* ---- Mata-Mata: votação de placar ---- */
-.pgame.mm{padding-bottom:10px;}
-.mm-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0;}
-.mm-team{flex:1;font-size:13px;font-weight:600;color:#eafaf3;display:flex;align-items:center;gap:5px;}
-.mm-team .fl{font-size:18px;}
-.mm-team-r{justify-content:flex-end;text-align:right;}
-.mm-score{display:flex;align-items:center;gap:6px;}
-.mm-g{width:46px;height:46px;text-align:center;font-size:20px;font-weight:800;border-radius:10px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;-moz-appearance:textfield;}
+/* ---- Mata-Mata: votação de placar (digitável) ---- */
+.pgame.mm{padding:14px 12px;background:rgba(255,255,255,.04);border-radius:14px;margin-bottom:12px;}
+.pgame.mm .lab{font-size:13px;font-weight:700;color:#bfeada;margin-bottom:10px;}
+.mm-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:6px 0;}
+.mm-team{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;}
+.mm-team .fl{font-size:20px;}
+.mm-team.casa{justify-content:flex-start;text-align:left;}
+.mm-team.fora{justify-content:flex-end;text-align:right;}
+.mm-score{display:flex;align-items:center;gap:10px;}
+.mm-g{width:58px;height:58px;text-align:center;font-size:28px;font-weight:900;border-radius:12px;
+  border:2px solid rgba(255,255,255,.45);background:#0d3b30;color:#ffffff;-moz-appearance:textfield;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.3);}
+.mm-g::placeholder{color:rgba(255,255,255,.35);font-weight:400;}
 .mm-g::-webkit-outer-spin-button,.mm-g::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-.mm-g:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.18);}
-.mm-x{font-size:16px;color:#9fd9c4;font-weight:700;}
-.mm-quick{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:6px;}
-.mm-q{font-size:12px;padding:5px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#cfe9dd;cursor:pointer;}
-.mm-q:hover{background:rgba(255,255,255,.12);}
-.mm-q.qa{background:var(--gold);color:#1a3c34;border-color:var(--gold);font-weight:700;}
-.mm-pen{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px;padding:8px;background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.3);border-radius:9px;}
-.mm-pen-l{font-size:12px;font-weight:700;color:#f7c873;width:100%;}
-.mm-penbtn{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#eafaf3;cursor:pointer;}
-.mm-penbtn.sel{background:var(--gold);color:#1a3c34;border-color:var(--gold);font-weight:700;}
-
+.mm-g:focus{outline:none;border-color:var(--gold);background:#114a3c;box-shadow:0 0 0 3px rgba(243,200,80,.25);}
+.mm-x{font-size:20px;color:#f3c850;font-weight:900;}
+.mm-quick{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px;}
+.mm-qlabel{width:100%;text-align:center;font-size:11px;color:#88b5a6;margin-bottom:2px;}
+.mm-q{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#cfe9dd;cursor:pointer;}
+.mm-q:hover{background:rgba(255,255,255,.14);}
+.mm-q.qa{background:var(--gold);color:#10342c;border-color:var(--gold);font-weight:800;}
+.mm-pen{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;padding:10px;background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.35);border-radius:10px;}
+.mm-pen-l{font-size:12.5px;font-weight:800;color:#f7c873;width:100%;}
+.mm-penbtn{font-size:13px;padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:#fff;cursor:pointer;font-weight:600;}
+.mm-penbtn.sel{background:var(--gold);color:#10342c;border-color:var(--gold);font-weight:800;}
 </style></head><body>
 
 <div id="welcome">
@@ -391,15 +396,15 @@ function renderPalpitar(){
       const empate=(gc!==''&&gf!==''&&Number(gc)===Number(gf));
       html+=`<div class="pgame mm" data-j="${j.id}"><div class="lab">${j.casa.nome} × ${j.fora.nome}${locked?' · (encerrado)':''}</div>
       <div class="mm-row">
-        <div class="mm-team"><span class="fl">${j.casa.flag}</span>${j.casa.nome}</div>
+        <div class="mm-team casa"><span class="fl">${j.casa.flag}</span>${j.casa.nome}</div>
         <div class="mm-score">
-          <input type="number" min="0" max="20" class="mm-g" data-j="${j.id}" data-side="gc" value="${gc}" ${locked?'disabled':''} inputmode="numeric">
+          <input type="number" min="0" max="20" class="mm-g" data-j="${j.id}" data-side="gc" value="${gc}" placeholder="0" ${locked?'disabled':''} inputmode="numeric" pattern="[0-9]*">
           <span class="mm-x">×</span>
-          <input type="number" min="0" max="20" class="mm-g" data-j="${j.id}" data-side="gf" value="${gf}" ${locked?'disabled':''} inputmode="numeric">
+          <input type="number" min="0" max="20" class="mm-g" data-j="${j.id}" data-side="gf" value="${gf}" placeholder="0" ${locked?'disabled':''} inputmode="numeric" pattern="[0-9]*">
         </div>
-        <div class="mm-team mm-team-r">${j.fora.nome}<span class="fl">${j.fora.flag}</span></div>
+        <div class="mm-team fora">${j.fora.nome}<span class="fl">${j.fora.flag}</span></div>
       </div>
-      <div class="mm-quick">`+[ '1-0','2-0','2-1','3-0','3-1','0-0','1-1','2-2','0-1','0-2','1-2','1-3' ].map(q=>{const[a,b]=q.split('-');const act=(String(gc)===a&&String(gf)===b)?'qa':'';return `<button class="mm-q ${act}" data-j="${j.id}" data-gc="${a}" data-gf="${b}" ${locked?'disabled':''}>${a}×${b}</button>`;}).join('')+`</div>`;
+      <div class="mm-quick"><span class="mm-qlabel">⚡ atalhos rápidos (ou digite acima)</span>`+[ '1-0','2-0','2-1','3-0','3-1','0-0','1-1','2-2','0-1','0-2','1-2','1-3' ].map(q=>{const[a,b]=q.split('-');const act=(String(gc)===a&&String(gf)===b)?'qa':'';return `<button class="mm-q ${act}" data-j="${j.id}" data-gc="${a}" data-gf="${b}" ${locked?'disabled':''}>${a}×${b}</button>`;}).join('')+`</div>`;
       if(empate){
         const penSel=p.pen||'';
         html+=`<div class="mm-pen"><span class="mm-pen-l">🥅 Quem passa nos pênaltis?</span>
@@ -424,14 +429,16 @@ function renderPalpitar(){
   if(tp)tp.onclick=()=>{localStorage.removeItem('bolao_perfil');localStorage.removeItem('bolao_vulgo');location.reload();};
   // grupos: botões 1/X/2
   document.querySelectorAll('#palpitar .opts button').forEach(b=>b.onclick=()=>{palpites[b.dataset.j]=b.dataset.v;renderPalpitar();});
-  // mata-mata: inputs de gols
+  // mata-mata: inputs de gols (digitação fluida, só re-renderiza se mudar status de empate)
   document.querySelectorAll('#palpitar .mm-g').forEach(inp=>inp.oninput=()=>{
     const id=inp.dataset.j;const side=inp.dataset.side;const p=palpites[id]||{};
+    const eraEmpate=(p.gc!=null&&p.gf!=null&&p.gc===p.gf);
     let val=inp.value===''?null:Math.max(0,Math.min(20,parseInt(inp.value)||0));
     p[side]=val; palpites[id]={...p};
-    // se deixou de ser empate, limpa o pênalti
-    if(!(p.gc!=null&&p.gf!=null&&p.gc===p.gf))p.pen='';
-    renderPalpitar();
+    const ehEmpate=(p.gc!=null&&p.gf!=null&&p.gc===p.gf);
+    if(!ehEmpate)p.pen='';
+    // só re-renderiza se o status de empate mudou (pra mostrar/esconder a pergunta de pênalti)
+    if(eraEmpate!==ehEmpate){const pos=inp.selectionStart;renderPalpitar();}
   });
   // mata-mata: botões de placar rápido
   document.querySelectorAll('#palpitar .mm-q').forEach(b=>b.onclick=()=>{
