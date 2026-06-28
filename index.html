@@ -460,8 +460,7 @@ function montar(){
   const lbl=nomeRodada(palpRod);
   if(mm){
     const lista=JOGOS.filter(j=>j.rodada==palpRod&&!resOf(j.id));
-    let linhas=lista.map(j=>{const p=palpites[j.id]||{};
-      if(p.gc==null||p.gf==null)return `${j.casa.nome} x ${j.fora.nome}: —`;
+    let linhas=lista.filter(j=>{const p=palpites[j.id]||{};return p.gc!=null&&p.gf!=null;}).map(j=>{const p=palpites[j.id];
       let s=`${j.casa.nome} ${p.gc} x ${p.gf} ${j.fora.nome}`;
       if(p.gc===p.gf&&p.pen){const q=p.pen==='C'?j.casa.nome:j.fora.nome;s+=` (passa: ${q})`;}
       return s;});
@@ -479,19 +478,20 @@ function enviar(){
   if(!vulgo){err.textContent='Escolha seu perfil na tela inicial.';return;}
   if(!lista.length){err.textContent='Nenhum jogo em aberto nesta rodada.';return;}
   if(mm){
-    // validar: cada jogo precisa de gc e gf; se empate, precisa de pênalti
-    const faltam=lista.filter(j=>{const p=palpites[j.id]||{};return p.gc==null||p.gf==null;});
-    if(faltam.length){err.textContent=`Faltam ${faltam.length} placar(es).`;return;}
-    const faltaPen=lista.filter(j=>{const p=palpites[j.id]||{};return p.gc===p.gf&&!p.pen;});
-    if(faltaPen.length){err.textContent=`Em ${faltaPen.length} jogo(s) que você apostou empate, escolha quem passa nos pênaltis.`;return;}
+    // jogos que a pessoa preencheu (pelo menos 1 placar completo)
+    const votados=lista.filter(j=>{const p=palpites[j.id]||{};return p.gc!=null&&p.gf!=null;});
+    if(!votados.length){err.textContent='Preencha o placar de pelo menos um jogo.';return;}
+    // empates preenchidos precisam ter quem passa nos pênaltis
+    const faltaPen=votados.filter(j=>{const p=palpites[j.id]||{};return p.gc===p.gf&&!p.pen;});
+    if(faltaPen.length){err.textContent=`⚠️ Em ${faltaPen.length} empate(s) você precisa escolher quem passa nos pênaltis (role pra achar).`;return;}
     err.textContent='';
     window.open('https://wa.me/?text='+encodeURIComponent(montar()),'_blank');
-    const rodadaReal=Number(lista[0].rodada);
+    const rodadaReal=Number(votados[0].rodada);
     if(APPS_SCRIPT_URL && PERFIL && PERFIL!=='Visitante'){
       const votosPayload={};
-      lista.forEach(j=>{const p=palpites[j.id];if(p&&p.gc!=null&&p.gf!=null){
+      votados.forEach(j=>{const p=palpites[j.id];
         votosPayload[j.casa.nome+'|'+j.fora.nome]={gc:p.gc,gf:p.gf,pen:(p.gc===p.gf?(p.pen||''):'')};
-      }});
+      });
       fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
         body:JSON.stringify({nome:perfilPlanilha,rodada:rodadaReal,tipo:'mm',votos:votosPayload})
       }).then(r=>r.json()).then(d=>{if(d.ok)console.log('[Bolão] MM salvo ✓');else console.warn('[Bolão]',d.msg);}).catch(()=>{});
