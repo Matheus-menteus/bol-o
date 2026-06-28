@@ -1466,6 +1466,346 @@
           "Argentina"
         ]
       }
+    },
+    {
+      "id": "mm-73",
+      "num": 73,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-28",
+      "casa": {
+        "nome": "África do Sul",
+        "flag": "🇿🇦",
+        "api": [
+          "South Africa"
+        ]
+      },
+      "fora": {
+        "nome": "Canadá",
+        "flag": "🇨🇦",
+        "api": [
+          "Canada"
+        ]
+      }
+    },
+    {
+      "id": "mm-74",
+      "num": 74,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-29",
+      "casa": {
+        "nome": "Alemanha",
+        "flag": "🇩🇪",
+        "api": [
+          "Germany"
+        ]
+      },
+      "fora": {
+        "nome": "Paraguai",
+        "flag": "🇵🇾",
+        "api": [
+          "Paraguay"
+        ]
+      }
+    },
+    {
+      "id": "mm-75",
+      "num": 75,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-29",
+      "casa": {
+        "nome": "Holanda",
+        "flag": "🇳🇱",
+        "api": [
+          "Netherlands"
+        ]
+      },
+      "fora": {
+        "nome": "Marrocos",
+        "flag": "🇲🇦",
+        "api": [
+          "Morocco"
+        ]
+      }
+    },
+    {
+      "id": "mm-76",
+      "num": 76,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-29",
+      "casa": {
+        "nome": "Brasil",
+        "flag": "🇧🇷",
+        "api": [
+          "Brazil"
+        ]
+      },
+      "fora": {
+        "nome": "Japão",
+        "flag": "🇯🇵",
+        "api": [
+          "Japan"
+        ]
+      }
+    },
+    {
+      "id": "mm-77",
+      "num": 77,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-30",
+      "casa": {
+        "nome": "França",
+        "flag": "🇫🇷",
+        "api": [
+          "France"
+        ]
+      },
+      "fora": {
+        "nome": "Suécia",
+        "flag": "🇸🇪",
+        "api": [
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "id": "mm-78",
+      "num": 78,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-30",
+      "casa": {
+        "nome": "Costa do Marfim",
+        "flag": "🇨🇮",
+        "api": [
+          "Côte d'Ivoire",
+          "Ivory Coast"
+        ]
+      },
+      "fora": {
+        "nome": "Noruega",
+        "flag": "🇳🇴",
+        "api": [
+          "Norway"
+        ]
+      }
+    },
+    {
+      "id": "mm-79",
+      "num": 79,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-06-30",
+      "casa": {
+        "nome": "México",
+        "flag": "🇲🇽",
+        "api": [
+          "Mexico"
+        ]
+      },
+      "fora": {
+        "nome": "Equador",
+        "flag": "🇪🇨",
+        "api": [
+          "Ecuador"
+        ]
+      }
+    },
+    {
+      "id": "mm-80",
+      "num": 80,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-01",
+      "casa": {
+        "nome": "Inglaterra",
+        "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+        "api": [
+          "England"
+        ]
+      },
+      "fora": {
+        "nome": "RD Congo",
+        "flag": "🇨🇩",
+        "api": [
+          "DR Congo",
+          "Congo DR"
+        ]
+      }
+    },
+    {
+      "id": "mm-81",
+      "num": 81,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-01",
+      "casa": {
+        "nome": "Estados Unidos",
+        "flag": "🇺🇸",
+        "api": [
+          "United States",
+          "USA"
+        ]
+      },
+      "fora": {
+        "nome": "Bósnia e Herz.",
+        "flag": "🇧🇦",
+        "api": [
+          "Bosnia and Herzegovina"
+        ]
+      }
+    },
+    {
+      "id": "mm-82",
+      "num": 82,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-03",
+      "casa": {
+        "nome": "Bélgica",
+        "flag": "🇧🇪",
+        "api": [
+          "Belgium"
+        ]
+      },
+      "fora": {
+        "nome": "Senegal",
+        "flag": "🇸🇳",
+        "api": [
+          "Senegal"
+        ]
+      }
+    },
+    {
+      "id": "mm-83",
+      "num": 83,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-02",
+      "casa": {
+        "nome": "Portugal",
+        "flag": "🇵🇹",
+        "api": [
+          "Portugal"
+        ]
+      },
+      "fora": {
+        "nome": "Croácia",
+        "flag": "🇭🇷",
+        "api": [
+          "Croatia"
+        ]
+      }
+    },
+    {
+      "id": "mm-84",
+      "num": 84,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-02",
+      "casa": {
+        "nome": "Espanha",
+        "flag": "🇪🇸",
+        "api": [
+          "Spain"
+        ]
+      },
+      "fora": {
+        "nome": "Áustria",
+        "flag": "🇦🇹",
+        "api": [
+          "Austria"
+        ]
+      }
+    },
+    {
+      "id": "mm-85",
+      "num": 85,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-02",
+      "casa": {
+        "nome": "Suíça",
+        "flag": "🇨🇭",
+        "api": [
+          "Switzerland"
+        ]
+      },
+      "fora": {
+        "nome": "Argélia",
+        "flag": "🇩🇿",
+        "api": [
+          "Algeria"
+        ]
+      }
+    },
+    {
+      "id": "mm-86",
+      "num": 86,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-03",
+      "casa": {
+        "nome": "Argentina",
+        "flag": "🇦🇷",
+        "api": [
+          "Argentina"
+        ]
+      },
+      "fora": {
+        "nome": "Cabo Verde",
+        "flag": "🇨🇻",
+        "api": [
+          "Cape Verde",
+          "Cabo Verde"
+        ]
+      }
+    },
+    {
+      "id": "mm-87",
+      "num": 87,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-03",
+      "casa": {
+        "nome": "Colômbia",
+        "flag": "🇨🇴",
+        "api": [
+          "Colombia"
+        ]
+      },
+      "fora": {
+        "nome": "Gana",
+        "flag": "🇬🇭",
+        "api": [
+          "Ghana"
+        ]
+      }
+    },
+    {
+      "id": "mm-88",
+      "num": 88,
+      "rodada": 4,
+      "fase": "r32",
+      "data": "2026-07-03",
+      "casa": {
+        "nome": "Austrália",
+        "flag": "🇦🇺",
+        "api": [
+          "Australia"
+        ]
+      },
+      "fora": {
+        "nome": "Egito",
+        "flag": "🇪🇬",
+        "api": [
+          "Egypt"
+        ]
+      }
     }
   ]
 }
