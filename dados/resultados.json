@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-06-28T00:02:05.568Z",
+  "atualizado": "2026-06-28T05:01:34.421Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -381,7 +381,7 @@
     },
     "r3-17": {
       "casa": 1,
-      "fora": 2,
+      "fora": 1,
       "status": "encerrado",
       "fonte": "api"
     },
@@ -406,13 +406,25 @@
     "r3-21": {
       "casa": 0,
       "fora": 0,
-      "status": "ao_vivo",
+      "status": "encerrado",
       "fonte": "api"
     },
     "r3-22": {
-      "casa": 1,
+      "casa": 3,
       "fora": 1,
-      "status": "ao_vivo",
+      "status": "encerrado",
+      "fonte": "api"
+    },
+    "r3-23": {
+      "casa": 3,
+      "fora": 3,
+      "status": "encerrado",
+      "fonte": "api"
+    },
+    "r3-24": {
+      "casa": 1,
+      "fora": 3,
+      "status": "encerrado",
       "fonte": "api"
     }
   }
