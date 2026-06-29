@@ -160,6 +160,13 @@ footer{text-align:center;color:rgba(255,255,255,.45);font-size:11px;padding:18px
 .mm-pen-l{font-size:12.5px;font-weight:800;color:#f7c873;width:100%;}
 .mm-penbtn{font-size:13px;padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:#fff;cursor:pointer;font-weight:600;}
 .mm-penbtn.sel{background:var(--gold);color:#10342c;border-color:var(--gold);font-weight:800;}
+
+/* votos mata-mata na aba palpites */
+.mmv{display:inline-flex;align-items:center;gap:3px;font-size:13px;}
+.mmv b{font-size:14px;font-weight:800;color:#fff;}
+.mmv-none{opacity:.4;}
+.mmchip{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.15)!important;}
+
 </style></head><body>
 
 <div id="welcome">
@@ -548,17 +555,31 @@ function buildAdmin(){
 /* ---------- PALPITES (consultar o que cada um votou) ---------- */
 let pvModo='jogo', pvRod=null, pvPessoa=null;
 function pickLabel(j,p){return p==='C'?`${j.casa.flag} ${j.casa.nome}`:p==='F'?`${j.fora.flag} ${j.fora.nome}`:p==='E'?'🤝 Empate':'—';}
+// label de voto do mata-mata: placar + bandeira de quem a pessoa acha que passa
+function pickLabelMM(j,p){
+  if(!p||p.gc==null||p.gf==null)return '<span class="mmv-none">—</span>';
+  let passa='';
+  if(p.gc>p.gf)passa=j.casa.flag; else if(p.gf>p.gc)passa=j.fora.flag;
+  else passa=(p.pen==='C'?j.casa.flag:p.pen==='F'?j.fora.flag:'⚪');
+  return `<span class="mmv"><b>${p.gc}×${p.gf}</b> ${passa}</span>`;
+}
 function renderPalpites(){
   if(!JOGADORES.length){$("#palpites").innerHTML='<div class="err">Sem votos carregados.</div>';return;}
   const rods=rodadas();if(pvRod==null)pvRod=rods[0];
   let html=`<div class="rodtabs"><button class="pv-modo ${pvModo==='jogo'?'active':''}" data-m="jogo">Por jogo</button><button class="pv-modo ${pvModo==='pessoa'?'active':''}" data-m="pessoa">Por pessoa</button></div>`;
   if(pvModo==='jogo'){
-    html+='<div class="rodtabs">'+rods.map(r=>`<button data-r="${r}" class="${r==pvRod?'active':''}">Rodada ${r}</button>`).join('')+'</div>';
-    const lista=JOGOS.filter(j=>j.rodada==pvRod);let dia='';
+    html+='<div class="rodtabs">'+rods.map(r=>`<button data-r="${r}" class="${r==pvRod?'active':''}">${nomeRodada(r)}</button>`).join('')+'</div>';
+    const lista=JOGOS.filter(j=>j.rodada==pvRod);let dia='';const mmRod=ehMataMata(pvRod);
     lista.forEach(j=>{ if(j.data!==dia){dia=j.data;html+=`<div class="day"><span class="dot"></span><span class="d">${fmtDia(j.data)}</span><span class="line"></span></div>`;}
       const out=outcome(resOf(j.id));const v=VOT[j.id]||{};
-      const chips=JOGADORES.map(n=>{const pk=v[n];const cls=out?(pk===out?'hit':'miss'):'neutral';return `<span class="ac ${cls}"><span class="who">${n}:</span> ${pickLabel(j,pk)}</span>`;}).join('');
-      html+=`<div class="match"><div class="match-top"><span class="grp">Grupo ${j.grupo}</span>${out?'<span class="st enc">com resultado</span>':'<span class="st pend">a jogar</span>'}</div>
+      const etiqueta=mmRod?nomeRodada(pvRod):('Grupo '+(j.grupo||'?'));
+      let chips;
+      if(mmRod){
+        chips=JOGADORES.map(n=>`<span class="ac neutral mmchip"><span class="who">${n}:</span> ${pickLabelMM(j,v[n])}</span>`).join('');
+      } else {
+        chips=JOGADORES.map(n=>{const pk=v[n];const cls=out?(pk===out?'hit':'miss'):'neutral';return `<span class="ac ${cls}"><span class="who">${n}:</span> ${pickLabel(j,pk)}</span>`;}).join('');
+      }
+      html+=`<div class="match"><div class="match-top"><span class="grp">${etiqueta}</span>${out?'<span class="st enc">com resultado</span>':'<span class="st pend">a jogar</span>'}</div>
       <div class="teams" style="margin-bottom:9px"><div class="team"><span class="flag">${j.casa.flag}</span><span class="nm">${j.casa.nome}</span></div><div class="vs">×</div><div class="team"><span class="flag">${j.fora.flag}</span><span class="nm">${j.fora.nome}</span></div></div>
       <div class="acertos left" style="border-top:1px dashed var(--line)">${chips}</div></div>`; });
   } else {
@@ -567,11 +588,18 @@ function renderPalpites(){
     let acertos=0,decididos=0;
     rods.forEach(r=>{
       html+=`<div class="day"><span class="dot"></span><span class="d">Rodada ${r}</span><span class="line"></span></div>`;
+      const mmR=ehMataMata(r);
       JOGOS.filter(j=>j.rodada==r).forEach(j=>{const v=(VOT[j.id]||{})[pvPessoa];const out=outcome(resOf(j.id));
-        const cls=out?(v===out?'hit':'miss'):'neutral';if(out){decididos++;if(v===out)acertos++;}
-        html+=`<div class="pgame" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:7px">
-          <div style="font-size:12px;font-weight:700;color:var(--ink)">${j.casa.nome} <span style="color:var(--muted)">×</span> ${j.fora.nome}</div>
-          <span class="ac ${cls}" style="white-space:nowrap">${pickLabel(j,v)}${out?(v===out?' ✓':' ✗'):''}</span></div>`;});
+        if(mmR){
+          html+=`<div class="pgame" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:7px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink)">${j.casa.nome} <span style="color:var(--muted)">×</span> ${j.fora.nome}</div>
+            <span class="ac neutral mmchip" style="white-space:nowrap">${pickLabelMM(j,v)}</span></div>`;
+        } else {
+          const cls=out?(v===out?'hit':'miss'):'neutral';if(out){decididos++;if(v===out)acertos++;}
+          html+=`<div class="pgame" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:7px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink)">${j.casa.nome} <span style="color:var(--muted)">×</span> ${j.fora.nome}</div>
+            <span class="ac ${cls}" style="white-space:nowrap">${pickLabel(j,v)}${out?(v===out?' ✓':' ✗'):''}</span></div>`;
+        }});
     });
     html=html.replace('','');
     html=`<div class="secnote" style="margin-top:6px"><b>${pvPessoa}</b> — ${acertos} acertos em ${decididos} jogos decididos</div>`+html;
