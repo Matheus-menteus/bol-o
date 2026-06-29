@@ -583,6 +583,373 @@
       "Luigi": "F",
       "Yugi": "F",
       "Giovani": "F"
+    },
+    "mm-74": {
+      "Matheus": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 2,
+        "gf": 1
+      },
+      "Giovani": {
+        "gc": 3,
+        "gf": 2
+      }
+    },
+    "mm-77": {
+      "Matheus": {
+        "gc": 4,
+        "gf": 1
+      },
+      "Felipe": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 4,
+        "gf": 1
+      }
+    },
+    "mm-73": {
+      "Matheus": {
+        "gc": 2,
+        "gf": 2,
+        "pen": "C"
+      },
+      "Felipe": {
+        "gc": 0,
+        "gf": 2
+      },
+      "Fernando": {
+        "gc": 0,
+        "gf": 1
+      },
+      "Luigi": {
+        "gc": 1,
+        "gf": 2
+      },
+      "Yugi": {
+        "gc": 0,
+        "gf": 2
+      },
+      "Giovani": {
+        "gc": 1,
+        "gf": 2
+      }
+    },
+    "mm-75": {
+      "Matheus": {
+        "gc": 3,
+        "gf": 2
+      },
+      "Felipe": {
+        "gc": 2,
+        "gf": 1
+      },
+      "Fernando": {
+        "gc": 2,
+        "gf": 2,
+        "pen": "C"
+      },
+      "Yugi": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "F"
+      }
+    },
+    "mm-76": {
+      "Matheus": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 2,
+        "gf": 1
+      },
+      "Yugi": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 3,
+        "gf": 1
+      }
+    },
+    "mm-78": {
+      "Matheus": {
+        "gc": 1,
+        "gf": 2
+      },
+      "Felipe": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "F"
+      },
+      "Fernando": {
+        "gc": 0,
+        "gf": 2
+      },
+      "Yugi": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "C"
+      },
+      "Giovani": {
+        "gc": 1,
+        "gf": 2
+      }
+    },
+    "mm-79": {
+      "Matheus": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "F"
+      },
+      "Felipe": {
+        "gc": 0,
+        "gf": 1
+      },
+      "Fernando": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "C"
+      },
+      "Yugi": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 0,
+        "gf": 1
+      }
+    },
+    "mm-80": {
+      "Matheus": {
+        "gc": 3,
+        "gf": 1
+      },
+      "Felipe": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 2,
+        "gf": 1
+      }
+    },
+    "mm-81": {
+      "Matheus": {
+        "gc": 0,
+        "gf": 0,
+        "pen": "F"
+      },
+      "Felipe": {
+        "gc": 2,
+        "gf": 1
+      },
+      "Fernando": {
+        "gc": 3,
+        "gf": 1
+      },
+      "Yugi": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 2,
+        "gf": 0
+      }
+    },
+    "mm-82": {
+      "Matheus": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 0,
+        "gf": 1
+      },
+      "Fernando": {
+        "gc": 0,
+        "gf": 1
+      },
+      "Yugi": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 1,
+        "gf": 2
+      }
+    },
+    "mm-83": {
+      "Matheus": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "F"
+      },
+      "Fernando": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "C"
+      },
+      "Yugi": {
+        "gc": 1,
+        "gf": 2
+      },
+      "Giovani": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "C"
+      }
+    },
+    "mm-84": {
+      "Matheus": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 2,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 2,
+        "gf": 1
+      }
+    },
+    "mm-86": {
+      "Matheus": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 3,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 5,
+        "gf": 0
+      },
+      "Giovani": {
+        "gc": 3,
+        "gf": 0
+      }
+    },
+    "mm-88": {
+      "Matheus": {
+        "gc": 0,
+        "gf": 1
+      },
+      "Felipe": {
+        "gc": 0,
+        "gf": 0,
+        "pen": "F"
+      },
+      "Yugi": {
+        "gc": 0,
+        "gf": 1
+      },
+      "Giovani": {
+        "gc": 0,
+        "gf": 1
+      }
+    },
+    "mm-85": {
+      "Matheus": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 2,
+        "gf": 1
+      },
+      "Fernando": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 1,
+        "gf": 1,
+        "pen": "C"
+      },
+      "Giovani": {
+        "gc": 0,
+        "gf": 0,
+        "pen": "C"
+      }
+    },
+    "mm-87": {
+      "Matheus": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Felipe": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Fernando": {
+        "gc": 1,
+        "gf": 0
+      },
+      "Yugi": {
+        "gc": 0,
+        "gf": 0,
+        "pen": "C"
+      },
+      "Giovani": {
+        "gc": 2,
+        "gf": 1
+      }
     }
   }
 }
