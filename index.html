@@ -41,8 +41,7 @@ nav button.active{background:var(--pick);color:var(--pickink);box-shadow:0 4px 1
 .vs{font-size:12px;font-weight:800;color:var(--muted);}
 .score{font-size:26px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;min-width:62px;text-align:center;}
 .score span{color:var(--muted);font-weight:700;margin:0 3px;font-size:18px;}
-.score-pen{font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:2px;font-variant-numeric:tabular-nums;}
-.score-pen span{margin:0 2px;}
+.pen-line{font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-top:4px;font-variant-numeric:tabular-nums;}
 .score.pend{font-size:12px;font-weight:800;color:var(--muted);}
 .win-badge{font-size:11px;text-align:center;color:var(--pick2);font-weight:800;margin-top:6px;min-height:14px;}
 .acertos{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
@@ -344,14 +343,14 @@ function cardJogo(j){
   if(r){
     const live=r.status==='ao_vivo';
     st=live?'<span class="st live">Ao vivo</span>':(out==='E'?'<span class="st draw">Empate</span>':'<span class="st enc">Encerrado</span>');
-    score=`<div class="score">${r.casa}<span>–</span>${r.fora}</div>${r.pen?`<div class="score-pen">pên. ${r.penCasa}<span>–</span>${r.penFora}</div>`:``}`;
+    score=`<div class="score">${r.casa}<span>–</span>${r.fora}</div>`;
     if(out==='C'){c1='team win';c2='team lose';badge='🏆 '+j.casa.nome;} else if(out==='F'){c2='team win';c1='team lose';badge='🏆 '+j.fora.nome;} else badge='Empate';
     const v=VOT[j.id]||{};let chips='';JOGADORES.forEach(f=>{const hit=v[f]===out;chips+=`<span class="ac ${hit?'hit':'miss'}"><span class="who">${f}</span> ${hit?'✓':'✗'}</span>`;});
     if(JOGADORES.length)ac=`<div class="acertos">${chips}</div>`;
   }
   return `<div class="match"><div class="match-top"><span class="grp">Grupo ${j.grupo}</span>${st}</div>
   <div class="teams"><div class="${c1}"><span class="flag">${j.casa.flag}</span><span class="nm">${j.casa.nome}</span></div>${r?score:'<div class="vs">×</div>'}<div class="${c2}"><span class="flag">${j.fora.flag}</span><span class="nm">${j.fora.nome}</span></div></div>
-  ${r?`<div class="win-badge">${badge}</div>`:''}${ac}</div>`;
+  ${r?`${r.pen?`<div class="pen-line">pênaltis ${r.penCasa}–${r.penFora}</div>`:``}<div class="win-badge">${badge}</div>`:''}${ac}</div>`;
 }
 
 /* ---------- RANKING (automático: votos × resultados) ---------- */
