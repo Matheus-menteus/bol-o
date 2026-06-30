@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-06-30T12:02:58.108Z",
+  "atualizado": "2026-06-30T18:56:22.216Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -517,6 +517,13 @@
       "pen": "F",
       "penCasa": 2,
       "penFora": 3
+    },
+    "mm-78": {
+      "casa": 1,
+      "fora": 2,
+      "status": "ao_vivo",
+      "fonte": "api",
+      "vencedor": "Noruega"
     }
   }
 }
