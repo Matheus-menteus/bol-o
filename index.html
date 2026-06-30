@@ -41,6 +41,8 @@ nav button.active{background:var(--pick);color:var(--pickink);box-shadow:0 4px 1
 .vs{font-size:12px;font-weight:800;color:var(--muted);}
 .score{font-size:26px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;min-width:62px;text-align:center;}
 .score span{color:var(--muted);font-weight:700;margin:0 3px;font-size:18px;}
+.score-pen{font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:2px;font-variant-numeric:tabular-nums;}
+.score-pen span{margin:0 2px;}
 .score.pend{font-size:12px;font-weight:800;color:var(--muted);}
 .win-badge{font-size:11px;text-align:center;color:var(--pick2);font-weight:800;margin-top:6px;min-height:14px;}
 .acertos{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
@@ -227,7 +229,7 @@ function vencedorPalpite(p){ // do palpite de placar, quem a pessoa acha que pas
   return p.pen||null; // empate: depende do pênalti escolhido
 }
 function resOf(id){return RES[id]||null;}
-function outcome(r){if(!r)return null;if(r.casa>r.fora)return'C';if(r.casa<r.fora)return'F';return'E';}
+function outcome(r){if(!r)return null;if(r.pen)return r.pen;if(r.casa>r.fora)return'C';if(r.casa<r.fora)return'F';return'E';}
 
 /* ====== CRUZAMENTO AUTOMÁTICO DO MATA-MATA ====== */
 // Mapa oficial FIFA 2026: qual partida alimenta qual (por número oficial 73-104)
@@ -342,7 +344,7 @@ function cardJogo(j){
   if(r){
     const live=r.status==='ao_vivo';
     st=live?'<span class="st live">Ao vivo</span>':(out==='E'?'<span class="st draw">Empate</span>':'<span class="st enc">Encerrado</span>');
-    score=`<div class="score">${r.casa}<span>–</span>${r.fora}</div>`;
+    score=`<div class="score">${r.casa}<span>–</span>${r.fora}</div>${r.pen?`<div class="score-pen">pên. ${r.penCasa}<span>–</span>${r.penFora}</div>`:``}`;
     if(out==='C'){c1='team win';c2='team lose';badge='🏆 '+j.casa.nome;} else if(out==='F'){c2='team win';c1='team lose';badge='🏆 '+j.fora.nome;} else badge='Empate';
     const v=VOT[j.id]||{};let chips='';JOGADORES.forEach(f=>{const hit=v[f]===out;chips+=`<span class="ac ${hit?'hit':'miss'}"><span class="who">${f}</span> ${hit?'✓':'✗'}</span>`;});
     if(JOGADORES.length)ac=`<div class="acertos">${chips}</div>`;
