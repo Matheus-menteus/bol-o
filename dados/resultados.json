@@ -1,17 +1,19 @@
 {
-  "atualizado": "2026-06-30T04:44:54.006Z",
+  "atualizado": "2026-06-30T12:02:58.108Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "México"
     },
     "r1-02": {
       "casa": 2,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Coreia do Sul"
     },
     "r1-03": {
       "casa": 1,
@@ -23,7 +25,8 @@
       "casa": 4,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Estados Unidos"
     },
     "r1-05": {
       "casa": 1,
@@ -41,19 +44,22 @@
       "casa": 0,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Escócia"
     },
     "r1-08": {
       "casa": 2,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Austrália"
     },
     "r1-09": {
       "casa": 7,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Alemanha"
     },
     "r1-10": {
       "casa": 2,
@@ -65,13 +71,15 @@
       "casa": 1,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Costa do Marfim"
     },
     "r1-12": {
       "casa": 5,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Suécia"
     },
     "r1-13": {
       "casa": 0,
@@ -101,25 +109,29 @@
       "casa": 3,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "França"
     },
     "r1-18": {
       "casa": 1,
       "fora": 4,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Noruega"
     },
     "r1-19": {
       "casa": 3,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Argentina"
     },
     "r1-20": {
       "casa": 3,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Áustria"
     },
     "r1-21": {
       "casa": 1,
@@ -131,19 +143,22 @@
       "casa": 4,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Inglaterra"
     },
     "r1-23": {
       "casa": 1,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Gana"
     },
     "r1-24": {
       "casa": 1,
       "fora": 3,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Colômbia"
     },
     "r2-01": {
       "casa": 1,
@@ -155,55 +170,64 @@
       "casa": 4,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Suíça"
     },
     "r2-03": {
       "casa": 6,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Canadá"
     },
     "r2-04": {
       "casa": 1,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "México"
     },
     "r2-06": {
       "casa": 0,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Marrocos"
     },
     "r2-07": {
       "casa": 3,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Brasil"
     },
     "r2-08": {
       "casa": 0,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Paraguai"
     },
     "r2-05": {
       "casa": 2,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Estados Unidos"
     },
     "r2-10": {
       "casa": 5,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Holanda"
     },
     "r2-11": {
       "casa": 2,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Alemanha"
     },
     "r2-12": {
       "casa": 0,
@@ -215,13 +239,15 @@
       "casa": 0,
       "fora": 4,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Japão"
     },
     "r2-13": {
       "casa": 4,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Espanha"
     },
     "r2-14": {
       "casa": 0,
@@ -233,7 +259,8 @@
       "casa": 1,
       "fora": 3,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Egito"
     },
     "r2-15": {
       "casa": 2,
@@ -245,31 +272,36 @@
       "casa": 2,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Argentina"
     },
     "r2-18": {
       "casa": 3,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "França"
     },
     "r2-19": {
       "casa": 3,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Noruega"
     },
     "r2-20": {
       "casa": 1,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Argélia"
     },
     "r2-21": {
       "casa": 5,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Portugal"
     },
     "r2-22": {
       "casa": 0,
@@ -281,43 +313,50 @@
       "casa": 0,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Croácia"
     },
     "r2-24": {
       "casa": 1,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Colômbia"
     },
     "r3-01": {
       "casa": 2,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Suíça"
     },
     "r3-03": {
       "casa": 0,
       "fora": 3,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Brasil"
     },
     "r3-04": {
       "casa": 4,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Marrocos"
     },
     "r3-05": {
       "casa": 0,
       "fora": 3,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "México"
     },
     "r3-06": {
       "casa": 1,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "África do Sul"
     },
     "r3-02": {
       "casa": 3,
@@ -329,13 +368,15 @@
       "casa": 0,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Costa do Marfim"
     },
     "r3-08": {
       "casa": 2,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Equador"
     },
     "r3-09": {
       "casa": 1,
@@ -347,13 +388,15 @@
       "casa": 1,
       "fora": 3,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Holanda"
     },
     "r3-11": {
       "casa": 3,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Turquia"
     },
     "r3-12": {
       "casa": 0,
@@ -365,19 +408,22 @@
       "casa": 1,
       "fora": 4,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "França"
     },
     "r3-14": {
       "casa": 5,
       "fora": 0,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Senegal"
     },
     "r3-16": {
       "casa": 0,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Espanha"
     },
     "r3-17": {
       "casa": 1,
@@ -389,19 +435,22 @@
       "casa": 1,
       "fora": 5,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Bélgica"
     },
     "r3-19": {
       "casa": 0,
       "fora": 2,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Inglaterra"
     },
     "r3-20": {
       "casa": 2,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Croácia"
     },
     "r3-21": {
       "casa": 0,
@@ -413,7 +462,8 @@
       "casa": 3,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "RD Congo"
     },
     "r3-23": {
       "casa": 3,
@@ -425,7 +475,8 @@
       "casa": 1,
       "fora": 3,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Argentina"
     },
     "r3-15": {
       "casa": 0,
@@ -437,25 +488,35 @@
       "casa": 0,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Canadá"
     },
     "mm-76": {
       "casa": 2,
       "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Brasil"
     },
     "mm-74": {
-      "casa": 4,
-      "fora": 5,
+      "casa": 1,
+      "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Paraguai",
+      "pen": "F",
+      "penCasa": 3,
+      "penFora": 4
     },
     "mm-75": {
-      "casa": 3,
-      "fora": 4,
+      "casa": 1,
+      "fora": 1,
       "status": "encerrado",
-      "fonte": "api"
+      "fonte": "api",
+      "vencedor": "Marrocos",
+      "pen": "F",
+      "penCasa": 2,
+      "penFora": 3
     }
   }
 }
