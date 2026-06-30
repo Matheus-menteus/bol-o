@@ -27,10 +27,36 @@ export function casarTudo(jogos, apiMatches){
     for (const m of apiMatches){
       const ori=casa(j,m); if(!ori) continue;
       const st=statusDe(m.status); if(!st) break;
-      let cg=m.score?.fullTime?.home, fg=m.score?.fullTime?.away;
+      const sc=m.score||{};
+      const foiPenaltis = sc.duration === "PENALTY_SHOOTOUT";
+      let cg, fg;
+      if (foiPenaltis){
+        // placar = tempo normal + prorrogacao (penaltis vao em campos separados)
+        cg = (sc.regularTime?.home||0) + (sc.extraTime?.home||0);
+        fg = (sc.regularTime?.away||0) + (sc.extraTime?.away||0);
+      } else {
+        cg = sc.fullTime?.home; fg = sc.fullTime?.away;
+      }
       if (cg==null||fg==null) break;
-      if (ori==="invertido"){ const t=cg; cg=fg; fg=t; }
-      out[j.id]={casa:cg,fora:fg,status:st,fonte:"api"}; break;
+      let pCasa = sc.penalties?.home, pFora = sc.penalties?.away;
+      let venApi = sc.winner; // HOME_TEAM / AWAY_TEAM / DRAW
+      // a API usa home/away dela; mapeia pro casa/fora do bolao
+      if (ori==="invertido"){
+        let t=cg; cg=fg; fg=t;
+        t=pCasa; pCasa=pFora; pFora=t;
+        if (venApi==="HOME_TEAM") venApi="AWAY_TEAM";
+        else if (venApi==="AWAY_TEAM") venApi="HOME_TEAM";
+      }
+      const vencedor = venApi==="HOME_TEAM" ? j.casa.nome
+        : venApi==="AWAY_TEAM" ? j.fora.nome : null;
+      const r={casa:cg,fora:fg,status:st,fonte:"api"};
+      if (vencedor!=null) r.vencedor=vencedor;
+      if (foiPenaltis){
+        r.pen = (pCasa||0) > (pFora||0) ? "C" : "F";
+        r.penCasa = pCasa||0;
+        r.penFora = pFora||0;
+      }
+      out[j.id]=r; break;
     }
   }
   return out;
@@ -64,7 +90,7 @@ export function montarMensagem(jogos, votos, resultados, novos){
     const vencedor = d==="C"?`${j.casa.flag} ${j.casa.nome}`:d==="F"?`${j.fora.flag} ${j.fora.nome}`:"🤝 Empate";
     const v=votos.votos[id]||{};
     const acertaram=votos.jogadores.filter(n=>v[n]===d);
-    L.push(`• ${j.casa.nome} ${r.casa}x${r.fora} ${j.fora.nome}  →  ${vencedor}`);
+    L.push(`• ${j.casa.nome} ${r.casa}x${r.fora} ${j.fora.nome} → ${vencedor}`);
     L.push(`   ✅ ${acertaram.length?acertaram.join(", "):"ninguém"}`);
   }
   L.push("");
