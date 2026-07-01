@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-07-01T21:06:32.574Z",
+  "atualizado": "2026-07-01T22:46:54.555Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -547,11 +547,10 @@
       "vencedor": "Inglaterra"
     },
     "mm-82": {
-      "casa": 0,
-      "fora": 1,
+      "casa": 2,
+      "fora": 2,
       "status": "ao_vivo",
-      "fonte": "api",
-      "vencedor": "Senegal"
+      "fonte": "api"
     }
   }
 }
