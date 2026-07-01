@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-06-30T23:44:21.880Z",
+  "atualizado": "2026-07-01T03:53:59.604Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -531,6 +531,13 @@
       "status": "encerrado",
       "fonte": "api",
       "vencedor": "França"
+    },
+    "mm-79": {
+      "casa": 2,
+      "fora": 0,
+      "status": "ao_vivo",
+      "fonte": "api",
+      "vencedor": "México"
     }
   }
 }
