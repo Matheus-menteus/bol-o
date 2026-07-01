@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-07-01T17:13:11.861Z",
+  "atualizado": "2026-07-01T19:17:43.537Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -540,11 +540,11 @@
       "vencedor": "México"
     },
     "mm-80": {
-      "casa": 0,
+      "casa": 2,
       "fora": 1,
-      "status": "ao_vivo",
+      "status": "encerrado",
       "fonte": "api",
-      "vencedor": "RD Congo"
+      "vencedor": "Inglaterra"
     }
   }
 }
