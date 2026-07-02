@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-07-02T00:06:56.950Z",
+  "atualizado": "2026-07-02T20:41:06.951Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -552,6 +552,13 @@
       "status": "encerrado",
       "fonte": "api",
       "vencedor": "Bélgica"
+    },
+    "mm-84": {
+      "casa": 2,
+      "fora": 0,
+      "status": "ao_vivo",
+      "fonte": "api",
+      "vencedor": "Espanha"
     }
   }
 }
