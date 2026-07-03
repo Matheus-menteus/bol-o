@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-07-02T23:36:47.350Z",
+  "atualizado": "2026-07-03T02:57:20.285Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -561,10 +561,11 @@
       "vencedor": "Espanha"
     },
     "mm-83": {
-      "casa": 0,
-      "fora": 0,
-      "status": "ao_vivo",
-      "fonte": "api"
+      "casa": 2,
+      "fora": 1,
+      "status": "encerrado",
+      "fonte": "api",
+      "vencedor": "Portugal"
     }
   }
 }
