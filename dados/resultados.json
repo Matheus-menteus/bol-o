@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-07-04T04:10:52.518Z",
+  "atualizado": "2026-07-04T06:39:06.290Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -589,6 +589,18 @@
       "status": "encerrado",
       "fonte": "api",
       "vencedor": "Colômbia"
+    },
+    "mm-81": {
+      "casa": 2,
+      "fora": 0,
+      "status": "encerrado",
+      "fonte": "manual"
+    },
+    "mm-86": {
+      "casa": 3,
+      "fora": 2,
+      "status": "encerrado",
+      "fonte": "manual"
     }
   }
 }
