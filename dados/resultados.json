@@ -1,5 +1,5 @@
 {
-  "atualizado": "2026-07-03T21:06:18.022Z",
+  "atualizado": "2026-07-04T04:10:52.518Z",
   "resultados": {
     "r1-01": {
       "casa": 2,
@@ -582,6 +582,13 @@
       "pen": "F",
       "penCasa": 4,
       "penFora": 4
+    },
+    "mm-87": {
+      "casa": 1,
+      "fora": 0,
+      "status": "encerrado",
+      "fonte": "api",
+      "vencedor": "Colômbia"
     }
   }
 }
