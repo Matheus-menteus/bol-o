@@ -8,7 +8,7 @@ const VITRINE_PATH = "dados/vitrine.json";
 // IDs oficiais das Ligas na API-Football
 // 39: Premier, 61: Ligue 1, 140: La Liga, 78: Bundesliga, 135: Serie A
 // 2: Champions, 3: Europa, 843: Conference, 71: Brasileirão, 13: Libertadores
-const LIGAS = [39, 61, 140, 78, 135, 2, 3, 843, 71, 13];
+const LIGAS = [39, 61, 140, 73, 78, 135, 2, 3, 843, 71, 13];
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
