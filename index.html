@@ -249,7 +249,7 @@ function renderizarJogos(filtroDia) {
   });
 }
 
-// Navegação SPA e Abertura do Jogo
+// Navegação SPA
 function abrirJogo(id) {
   const jogo = jogosGlobal.find(j => String(j.id) === String(id));
   if (!jogo) return;
@@ -265,7 +265,6 @@ function abrirJogo(id) {
     ? `${jogo.casa.placar} - ${jogo.fora.placar}` 
     : formatarHora(jogo.dataHora);
 
-  // Header temporário (será reescrito ao vivo pela API)
   document.getElementById('partida-header').innerHTML = `
     <div class="match" style="cursor: default; transform: none; box-shadow: none;">
        <div style="text-align:center; font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 10px;">
@@ -290,9 +289,7 @@ function abrirJogo(id) {
   buscarEstatisticas(id);
 }
 
-// -------------------------------------------------------------
-// NOVA FUNÇÃO SUPER TURBINADA (Eventos, Cartões, Gols e Minutos)
-// -------------------------------------------------------------
+// Busca Estatísticas e Atualiza Memória Global
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
   container.innerHTML = '<div class="loading">Buscando dados em tempo real... ⏳</div>';
@@ -311,7 +308,16 @@ function buscarEstatisticas(id) {
        const liga = data.liveStats.league;
        const eventos = data.liveStats.events || []; 
        
-       // --- 1. ATUALIZA O CABEÇALHO (PLACAR E MINUTO REAL) ---
+       // --- ATUALIZA A MEMÓRIA GLOBAL (Para a Tela Inicial) ---
+       const indexJogo = jogosGlobal.findIndex(j => String(j.id) === String(id));
+       if (indexJogo !== -1) {
+           jogosGlobal[indexJogo].status = fix.status.short;
+           jogosGlobal[indexJogo].casa.placar = gols.home ?? 0;
+           jogosGlobal[indexJogo].fora.placar = gols.away ?? 0;
+       }
+       // -------------------------------------------------------
+
+       // Atualiza o Cabeçalho da Partida
        let statusTempo = fix.status.short;
        if (fix.status.elapsed && ['1H', '2H', 'HT', 'ET', 'LIVE'].includes(fix.status.short)) {
            statusTempo = `<span style="color: #ef4444; animation: pulse 2s infinite;">${fix.status.elapsed}'</span>`;
@@ -334,7 +340,7 @@ function buscarEstatisticas(id) {
          </div>
        `;
 
-       // --- 2. FILTRA OS GOLS E CARTÕES ---
+       // Filtra Eventos (Gols e Cartões)
        let htmlEventos = '';
        const golsECartoes = eventos.filter(e => e.type === "Goal" || e.type === "Card");
        
@@ -359,7 +365,7 @@ function buscarEstatisticas(id) {
            htmlEventos = `<p style="text-align:center; font-size: 13px; color: var(--muted);">Nenhum gol ou cartão registrado ainda.</p>`;
        }
 
-       // --- 3. MONTA A TELA DE ESTATÍSTICAS ---
+       // Tela de Estatísticas
        let htmlStats = `
           <div style="text-align:center; font-size: 13px; margin-bottom:15px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
             <p><b>Estádio:</b> ${fix.venue.name || 'Não informado'} | <b>Árbitro:</b> ${fix.referee || '-'}</p>
@@ -409,7 +415,14 @@ function buscarEstatisticas(id) {
     });
 }
 
+// Voltar re-renderizando a tela inicial
 function voltarParaVitrine() {
+  // Descobre qual filtro (Ontem, Hoje, Amanhã...) está selecionado
+  const filtroAtivo = document.querySelector('#filtros button.active').dataset.dia;
+  
+  // Re-desenha a vitrine para aplicar os placares novos que a API puxou!
+  renderizarJogos(filtroAtivo);
+
   document.getElementById('view-partida').classList.remove('active');
   document.getElementById('view-vitrine').classList.add('active');
 }
