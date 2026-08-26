@@ -293,12 +293,20 @@ function abrirJogo(id) {
   document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para gerar insights com IA</div>';
   document.getElementById('conteudo-live').innerHTML = '<div class="loading">Buscando estatísticas da partida...</div>';
 
-  // Dispara SOMENTE a busca de estatísticas para a aba Ao Vivo
+// Dispara a busca de estatísticas para a aba Ao Vivo
+  buscarEstatisticas(id);
+} // <--- Fim da função abrirJogo
+
+// NOVA FUNÇÃO: Busca e desenha as estatísticas (com o botão de atualizar)
+function buscarEstatisticas(id) {
+  const container = document.getElementById('conteudo-live');
+  container.innerHTML = '<div class="loading">Buscando estatísticas atualizadas... ⏳</div>';
+
   fetch(`/api/analise?jogoId=${id}&acao=stats`)
     .then(res => res.json())
     .then(data => {
        if(data.error) {
-         document.getElementById('conteudo-live').innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar estatísticas.</p>';
+         container.innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar estatísticas.</p>';
          return;
        }
        const fix = data.liveStats.fixture;
@@ -310,6 +318,47 @@ function abrirJogo(id) {
           </div>
        `;
 
+       if (stats && stats.length > 1) {
+          const hStats = stats[0].statistics;
+          const aStats = stats[1].statistics;
+          const pegaDado = (arr, tipo) => arr.find(s => s.type === tipo)?.value || 0;
+
+          htmlStats += `
+            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+               <span style="color:var(--teal)">${pegaDado(hStats, "Ball Possession")}</span>
+               <span style="color:var(--muted)">Posse de Bola</span>
+               <span style="color:var(--teal)">${pegaDado(aStats, "Ball Possession")}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+               <span style="color:var(--teal)">${pegaDado(hStats, "Total Shots")}</span>
+               <span style="color:var(--muted)">Finalizações</span>
+               <span style="color:var(--teal)">${pegaDado(aStats, "Total Shots")}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+               <span style="color:var(--teal)">${pegaDado(hStats, "Fouls")}</span>
+               <span style="color:var(--muted)">Faltas</span>
+               <span style="color:var(--teal)">${pegaDado(aStats, "Fouls")}</span>
+            </div>
+          `;
+       } else {
+          htmlStats += `<p style="text-align:center; color: var(--muted);">Estatísticas aprofundadas ficarão disponíveis durante o jogo.</p>`;
+       }
+
+       // A MÁGICA: O botãozinho de atualizar injetado no final
+       htmlStats += `
+          <div style="text-align: center; margin-top: 25px;">
+            <button onclick="buscarEstatisticas('${id}')" style="background: var(--pick); color: var(--pickink); border: none; padding: 10px 24px; border-radius: 99px; font-weight: 800; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(0,194,122,.35); transition: transform 0.1s;">
+              🔄 Atualizar Tempo Real
+            </button>
+          </div>
+       `;
+       
+       container.innerHTML = htmlStats;
+    })
+    .catch(err => {
+       container.innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
+    });
+}
        // Se a API retornou estatísticas do jogo (geralmente durante ou após o jogo)
        if (stats && stats.length > 1) {
           const hStats = stats[0].statistics;
