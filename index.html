@@ -215,11 +215,9 @@ function renderizarJogos(filtroDia) {
       dataAtual = dataJogo;
     }
 
-    // Traduzindo status da API
     let stHtml = `<span class="st pend">A iniciar</span>`;
     let scoreHtml = `<div class="score pend">${formatarHora(j.dataHora)}</div>`;
     
-    // Status adaptados para a API-Football
     if (['1H', '2H', 'HT', 'ET', 'P', 'BT', 'LIVE'].includes(j.status)) {
       stHtml = `<span class="st live">Ao Vivo</span>`;
       scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
@@ -251,20 +249,18 @@ function renderizarJogos(filtroDia) {
   });
 }
 
-// Navegação SPA e Lazy Loading da IA
+// Navegação SPA
 function abrirJogo(id) {
   const jogo = jogosGlobal.find(j => String(j.id) === String(id));
   if (!jogo) return;
   
   jogoAtualId = id;
-  iaCarregada = false; // Garante que a IA não foi disparada ainda para este jogo
+  iaCarregada = false;
 
-  // Esconde Vitrine, Mostra Partida
   document.getElementById('view-vitrine').classList.remove('active');
   document.getElementById('view-partida').classList.add('active');
   window.scrollTo({top: 0, behavior: 'smooth'});
 
-  // Monta o Header do Jogo copiando o visual do card
   let scoreText = ['FT', 'AET', 'PEN', '1H', 'HT', '2H', 'ET', 'LIVE'].includes(jogo.status) 
     ? `${jogo.casa.placar} - ${jogo.fora.placar}` 
     : formatarHora(jogo.dataHora);
@@ -282,22 +278,19 @@ function abrirJogo(id) {
     </div>
   `;
 
-  // Reseta as abas e ativa a "Ao Vivo" como padrão
   document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
   document.querySelector('#tabs-partida button[data-tab="live"]').classList.add('active');
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-live').classList.add('active');
 
-  // Avisos de carregamento
   document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">⏳ Clique na aba para gerar a análise com IA</div>';
   document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para gerar insights com IA</div>';
-  document.getElementById('conteudo-live').innerHTML = '<div class="loading">Buscando estatísticas da partida...</div>';
-
-// Dispara a busca de estatísticas para a aba Ao Vivo
+  
+  // Chama a nova função com o botão de atualizar
   buscarEstatisticas(id);
-} // <--- Fim da função abrirJogo
+}
 
-// NOVA FUNÇÃO: Busca e desenha as estatísticas (com o botão de atualizar)
+// Função de buscar estatísticas (com o botão de atualizar)
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
   container.innerHTML = '<div class="loading">Buscando estatísticas atualizadas... ⏳</div>';
@@ -344,7 +337,6 @@ function buscarEstatisticas(id) {
           htmlStats += `<p style="text-align:center; color: var(--muted);">Estatísticas aprofundadas ficarão disponíveis durante o jogo.</p>`;
        }
 
-       // A MÁGICA: O botãozinho de atualizar injetado no final
        htmlStats += `
           <div style="text-align: center; margin-top: 25px;">
             <button onclick="buscarEstatisticas('${id}')" style="background: var(--pick); color: var(--pickink); border: none; padding: 10px 24px; border-radius: 99px; font-weight: 800; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(0,194,122,.35); transition: transform 0.1s;">
@@ -357,38 +349,6 @@ function buscarEstatisticas(id) {
     })
     .catch(err => {
        container.innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
-    });
-}
-       // Se a API retornou estatísticas do jogo (geralmente durante ou após o jogo)
-       if (stats && stats.length > 1) {
-          const hStats = stats[0].statistics;
-          const aStats = stats[1].statistics;
-          const pegaDado = (arr, tipo) => arr.find(s => s.type === tipo)?.value || 0;
-
-          htmlStats += `
-            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
-               <span style="color:var(--teal)">${pegaDado(hStats, "Ball Possession")}</span>
-               <span style="color:var(--muted)">Posse de Bola</span>
-               <span style="color:var(--teal)">${pegaDado(aStats, "Ball Possession")}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
-               <span style="color:var(--teal)">${pegaDado(hStats, "Total Shots")}</span>
-               <span style="color:var(--muted)">Finalizações</span>
-               <span style="color:var(--teal)">${pegaDado(aStats, "Total Shots")}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
-               <span style="color:var(--teal)">${pegaDado(hStats, "Fouls")}</span>
-               <span style="color:var(--muted)">Faltas</span>
-               <span style="color:var(--teal)">${pegaDado(aStats, "Fouls")}</span>
-            </div>
-          `;
-       } else {
-          htmlStats += `<p style="text-align:center; color: var(--muted);">Estatísticas aprofundadas ficarão disponíveis durante o jogo.</p>`;
-       }
-       document.getElementById('conteudo-live').innerHTML = htmlStats;
-    })
-    .catch(err => {
-       document.getElementById('conteudo-live').innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
     });
 }
 
@@ -406,20 +366,18 @@ document.querySelectorAll('#filtros button').forEach(btn => {
   });
 });
 
-// Listener que Dispara a IA apenas quando a aba for clicada
+// IA click listener
 document.querySelectorAll('#tabs-partida button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const tabClicada = e.target.dataset.tab;
     
-    // Gerencia UI das Abas
     document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`tab-${tabClicada}`).classList.add('active');
 
-    // O LAZY LOADING: Se clicou em IA e ainda não carregou, dispara a requisição!
     if ((tabClicada === 'panorama' || tabClicada === 'insights') && !iaCarregada) {
-       iaCarregada = true; // Trava para não chamar de novo
+       iaCarregada = true;
        document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">A IA está decifrando as táticas deste jogo... ⏳</div>';
        document.getElementById('conteudo-insights').innerHTML = '<div class="loading">Buscando as melhores tendências... ⏳</div>';
 
@@ -427,10 +385,8 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
          .then(res => res.json())
          .then(data => {
             if(data.error) throw new Error(data.error);
-            // Preenche Panorama
             document.getElementById('conteudo-panorama').innerHTML = `<p style="line-height: 1.6; font-size: 14px;">${data.panorama.replace(/\n/g, '<br>')}</p>`;
 
-            // Preenche Insights com fonte escura e bolinhas douradas
             const arrayInsights = Array.isArray(data.insights) ? data.insights : data.insights.split('\n');
             const insightsHtml = arrayInsights.map(linha => {
               if (linha.trim() === '') return '';
@@ -445,7 +401,7 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
          .catch(err => {
             document.getElementById('conteudo-panorama').innerHTML = '<p style="color: red; text-align: center;">Falha ao conectar com a Inteligência Artificial.</p>';
             document.getElementById('conteudo-insights').innerHTML = '<p style="color: red; text-align: center;">Falha ao gerar insights.</p>';
-            iaCarregada = false; // Libera para tentar de novo caso clique em outra aba e volte
+            iaCarregada = false;
          });
     }
   });
