@@ -526,154 +526,320 @@ function enviar(){
 let admRod=null;
 function openAdmin(){buildAdmin();document.querySelectorAll('nav button,.tab').forEach(x=>x.classList.remove('active'));$("#admin").classList.add('active');window.scrollTo(0,0);}
 function closeAdmin(){const n=$("#pnome");if(n)n.value='';localStorage.setItem('bolao_nome','');$("#admin").classList.remove('active');document.querySelector('nav button[data-tab=jogos]').classList.add('active');$("#jogos").classList.add('active');renderJogos();renderRanking();}
-function buildAdmin(){
-  const rods=rodadas();if(admRod==null)admRod=rods[0];
-  let tabs='<div class="rodtabs">'+rods.map(r=>`<button data-r="${r}" class="${r==admRod?'active':''}">Rodada ${r}</button>`).join('')+'</div>';
-  const lista=JOGOS.filter(j=>j.rodada==admRod);
-  let gl='<div class="adm-card">';
-  lista.forEach(j=>{const r=resOf(j.id);const c=r?r.casa:'';const f=r?r.fora:'';
-    gl+=`<div class="adm-game"><span class="adm-grp">${j.grupo}</span><div class="adm-names">${j.casa.flag} ${j.casa.nome}<br>${j.fora.flag} ${j.fora.nome}</div>
-    <div class="adm-in"><input type="number" min="0" inputmode="numeric" value="${c}" data-j="${j.id}" data-s="casa"><span class="x">×</span><input type="number" min="0" inputmode="numeric" value="${f}" data-j="${j.id}" data-s="fora"></div></div>`;});
-  gl+='</div>';
-  const steps='<div class="adm-steps"><b>Placar manual</b> (caso o robô da API não esteja ligado ou demore). Preencha, baixe o <b>resultados.json</b> e suba na pasta <b>dados/</b> do GitHub. O ranking se recalcula sozinho.</div>';
-  $("#admin").innerHTML='<div class="adm-h">⚙️ Painel do admin</div><div class="adm-sub">Só você vê isto. O ranking é automático.</div>'+steps+tabs+gl
-    +'<button class="adm-btn adm-dl" id="admDl">💾 Baixar resultados.json</button><div class="adm-ok" id="admOk">✓ Baixado! Suba em dados/resultados.json no GitHub.</div>'
-    +'<button class="adm-btn adm-exit" id="admExit">↩️ Sair</button>';
-  document.querySelectorAll('#admin .rodtabs button').forEach(b=>b.onclick=()=>{admRod=+b.dataset.r;buildAdmin();});
-  document.querySelectorAll('#admin .adm-in input').forEach(inp=>inp.addEventListener('input',e=>{
-    const id=e.target.dataset.j,side=e.target.dataset.s,val=e.target.value;
-    const other=document.querySelector(`#admin .adm-in input[data-j="${id}"][data-s="${side==='casa'?'fora':'casa'}"]`).value;
-    const a=val===''?null:Math.max(0,parseInt(val,10)||0);const b=other===''?null:Math.max(0,parseInt(other,10)||0);
-    if(a===null||b===null){delete RES[id];}
-    else{const casa=side==='casa'?a:b,fora=side==='casa'?b:a;RES[id]={casa,fora,status:'encerrado',fonte:'manual'};}
-    renderJogos();renderRanking();}));
-  $("#admDl").onclick=()=>{const out={atualizado:new Date().toISOString(),resultados:RES};
-    const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json;charset=utf-8"});
-    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="resultados.json";document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(a.href),3000);$("#admOk").classList.add('show');};
-  $("#admExit").onclick=closeAdmin;
+function buildAdmin(){<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hub de Futebol & IA</title>
+<style>
+:root {
+  --pitch:#0A2B23; --pitch2:#0E3A2E; --paper:#FBFAF6; --ink:#10211C; --line:#E7E5DA;
+  --pick:#00C27A; --pick2:#00A266; --pickink:#04150F; --gold:#E9B949; --muted:#7C8B83;
+  --teal:#117A65; --shadow:0 10px 30px rgba(0,0,0,.18);
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; padding:0; }
+body {
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink); min-height:100vh; padding-bottom:40px; position:relative;
+  background:linear-gradient(180deg,var(--pitch),var(--pitch2));
+}
+body::before {
+  content:""; position:fixed; inset:0; z-index:-2;
+  background-image:url('https://images.unsplash.com/photo-1518605368461-1e1e38ce8058?q=80&w=1000&auto=format&fit=crop'); /* Fundo genérico de gramado */
+  background-size:cover; background-position:center; opacity: 0.15;
 }
 
-/* ---------- PALPITES (consultar o que cada um votou) ---------- */
-let pvModo='jogo', pvRod=null, pvPessoa=null;
-function pickLabel(j,p){return p==='C'?`${j.casa.flag} ${j.casa.nome}`:p==='F'?`${j.fora.flag} ${j.fora.nome}`:p==='E'?'🤝 Empate':'—';}
-// label de voto do mata-mata: placar + bandeira de quem a pessoa acha que passa
-function pickLabelMM(j,p){
-  if(!p||p.gc==null||p.gf==null)return '<span class="mmv-none">—</span>';
-  let passa='';
-  if(p.gc>p.gf)passa=j.casa.flag; else if(p.gf>p.gc)passa=j.fora.flag;
-  else passa=(p.pen==='C'?j.casa.flag:p.pen==='F'?j.fora.flag:'⚪');
-  return `<span class="mmv"><b>${p.gc}×${p.gf}</b> ${passa}</span>`;
+.wrap { max-width:600px; margin:0 auto; padding:0 14px 60px; }
+header { text-align:center; padding:22px 14px 14px; }
+.eyebrow { font-size:11px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:8px; }
+h1 { margin:0; color:#fff; font-size:28px; font-weight:900; letter-spacing:.01em; text-transform:uppercase; }
+h1 .thin { display:block; font-size:13px; font-weight:600; letter-spacing:.16em; color:#bfe8d6; margin-top:7px; }
+
+/* Navegação e Filtros */
+.filtros { display:flex; gap:7px; flex-wrap:wrap; margin:14px 0; justify-content: center; }
+.filtros button {
+  border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06);
+  color:#cfe9dd; font-family:inherit; font-weight:700; font-size:13px;
+  padding:7px 15px; border-radius:999px; cursor:pointer; transition: all 0.2s;
 }
-function renderPalpites(){
-  if(!JOGADORES.length){$("#palpites").innerHTML='<div class="err">Sem votos carregados.</div>';return;}
-  const rods=rodadas();if(pvRod==null)pvRod=rods[0];
-  let html=`<div class="rodtabs"><button class="pv-modo ${pvModo==='jogo'?'active':''}" data-m="jogo">Por jogo</button><button class="pv-modo ${pvModo==='pessoa'?'active':''}" data-m="pessoa">Por pessoa</button></div>`;
-  if(pvModo==='jogo'){
-    html+='<div class="rodtabs">'+rods.map(r=>`<button data-r="${r}" class="${r==pvRod?'active':''}">${nomeRodada(r)}</button>`).join('')+'</div>';
-    const lista=JOGOS.filter(j=>j.rodada==pvRod);let dia='';const mmRod=ehMataMata(pvRod);
-    lista.forEach(j=>{ if(j.data!==dia){dia=j.data;html+=`<div class="day"><span class="dot"></span><span class="d">${fmtDia(j.data)}</span><span class="line"></span></div>`;}
-      const out=outcome(resOf(j.id));const v=VOT[j.id]||{};
-      const etiqueta=mmRod?nomeRodada(pvRod):('Grupo '+(j.grupo||'?'));
-      let chips;
-      if(mmRod){
-        chips=JOGADORES.map(n=>`<span class="ac neutral mmchip"><span class="who">${n}:</span> ${pickLabelMM(j,v[n])}</span>`).join('');
-      } else {
-        chips=JOGADORES.map(n=>{const pk=v[n];const cls=out?(pk===out?'hit':'miss'):'neutral';return `<span class="ac ${cls}"><span class="who">${n}:</span> ${pickLabel(j,pk)}</span>`;}).join('');
-      }
-      html+=`<div class="match"><div class="match-top"><span class="grp">${etiqueta}</span>${out?'<span class="st enc">com resultado</span>':'<span class="st pend">a jogar</span>'}</div>
-      <div class="teams" style="margin-bottom:9px"><div class="team"><span class="flag">${j.casa.flag}</span><span class="nm">${j.casa.nome}</span></div><div class="vs">×</div><div class="team"><span class="flag">${j.fora.flag}</span><span class="nm">${j.fora.nome}</span></div></div>
-      <div class="acertos left" style="border-top:1px dashed var(--line)">${chips}</div></div>`; });
-  } else {
-    if(pvPessoa==null)pvPessoa=JOGADORES[0];
-    html+='<div class="rodtabs">'+JOGADORES.map(n=>`<button data-p="${n}" class="${n==pvPessoa?'active':''}">${n}</button>`).join('')+'</div>';
-    let acertos=0,decididos=0;
-    rods.forEach(r=>{
-      html+=`<div class="day"><span class="dot"></span><span class="d">Rodada ${r}</span><span class="line"></span></div>`;
-      const mmR=ehMataMata(r);
-      JOGOS.filter(j=>j.rodada==r).forEach(j=>{const v=(VOT[j.id]||{})[pvPessoa];const out=outcome(resOf(j.id));
-        if(mmR){
-          html+=`<div class="pgame" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:7px">
-            <div style="font-size:12px;font-weight:700;color:var(--ink)">${j.casa.nome} <span style="color:var(--muted)">×</span> ${j.fora.nome}</div>
-            <span class="ac neutral mmchip" style="white-space:nowrap">${pickLabelMM(j,v)}</span></div>`;
-        } else {
-          const cls=out?(v===out?'hit':'miss'):'neutral';if(out){decididos++;if(v===out)acertos++;}
-          html+=`<div class="pgame" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:7px">
-            <div style="font-size:12px;font-weight:700;color:var(--ink)">${j.casa.nome} <span style="color:var(--muted)">×</span> ${j.fora.nome}</div>
-            <span class="ac ${cls}" style="white-space:nowrap">${pickLabel(j,v)}${out?(v===out?' ✓':' ✗'):''}</span></div>`;
-        }});
-    });
-    html=html.replace('','');
-    html=`<div class="secnote" style="margin-top:6px"><b>${pvPessoa}</b> — ${acertos} acertos em ${decididos} jogos decididos</div>`+html;
+.filtros button.active { background:var(--teal); color:#fff; border-color:var(--teal); }
+
+.day { display:flex; align-items:center; gap:10px; margin:18px 2px 10px; }
+.day .dot { width:7px; height:7px; border-radius:99px; background:var(--gold); }
+.day .d { color:#fff; font-weight:800; font-size:13px; letter-spacing:.05em; text-transform:uppercase; }
+.day .line { flex:1; height:1px; background:rgba(255,255,255,.16); }
+
+/* Cards de Jogo */
+.match {
+  background:var(--paper); border-radius:14px; box-shadow:var(--shadow);
+  padding:12px 12px 13px; margin-bottom:11px; cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+.match:active { transform: scale(0.98); }
+.match-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:11px; }
+.grp { display:flex; align-items:center; gap:6px; font-size:10px; font-weight:800; letter-spacing:.05em; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:3px 7px; }
+.grp img { width: 14px; height: 14px; }
+.st { font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:3px 8px; border-radius:99px; }
+.st.enc { background:#E9F7F0; color:var(--pick2); }
+.st.pend { background:#EFEDE6; color:var(--muted); }
+.st.live { background:#ef4444; color:#fff; animation: pulse 2s infinite; }
+
+.teams { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:6px; }
+.team { display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
+.team img { width: 36px; height: 36px; object-fit: contain; } /* Escudos via API */
+.team .nm { font-size:13px; font-weight:700; line-height:1.15; }
+
+.vs { font-size:12px; font-weight:800; color:var(--muted); }
+.score { font-size:26px; font-weight:900; color:var(--ink); font-variant-numeric:tabular-nums; min-width:62px; text-align:center; }
+.score span { color:var(--muted); font-weight:700; margin:0 3px; font-size:18px; }
+.score.pend { font-size:14px; font-weight:800; color:var(--muted); }
+
+/* Views SPA */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.3s; }
+
+/* Botão Voltar */
+.btn-voltar {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; padding: 8px 16px; border-radius: 99px; font-weight: 700;
+  cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 5px;
+}
+
+/* Tabs Internas da Partida */
+.partida-tabs { display:flex; gap:6px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:5px; margin-bottom: 20px; }
+.partida-tabs button { flex:1; border:none; background:transparent; color:#cfe9dd; font-weight:800; font-size:11.5px; padding:11px 3px; border-radius:10px; cursor:pointer; }
+.partida-tabs button.active { background:var(--pick); color:var(--pickink); box-shadow:0 4px 12px rgba(0,194,122,.35); }
+
+.tab-content { display: none; color: #fff; }
+.tab-content.active { display: block; }
+.panel { background: var(--paper); border-radius: 14px; padding: 16px; color: var(--ink); box-shadow: var(--shadow); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+.loading { text-align:center; color:#cfe9dd; padding:40px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">⚽ Inteligência & Estatísticas</div>
+    <h1>Futebol Hub<span class="thin">Análises IA · Live Stats · Tendências</span></h1>
+  </header>
+
+  <!-- TELA INICIAL: VITRINE DE JOGOS -->
+  <div id="view-vitrine" class="view active">
+    <div class="filtros" id="filtros">
+      <button data-dia="todos" class="active">Todos</button>
+      <button data-dia="ontem">Ontem</button>
+      <button data-dia="hoje">Hoje</button>
+      <button data-dia="amanha">Amanhã</button>
+    </div>
+    <div id="lista-jogos"><div class="loading">Buscando agenda de jogos...</div></div>
+  </div>
+
+  <!-- TELA DE DETALHES DA PARTIDA -->
+  <div id="view-partida" class="view">
+    <button class="btn-voltar" onclick="voltarParaVitrine()">⬅ Voltar para Jogos</button>
+    
+    <!-- Cabeçalho do jogo selecionado será injetado aqui -->
+    <div id="partida-header"></div>
+
+    <div class="partida-tabs" id="tabs-partida">
+      <button data-tab="panorama" class="active">🧠 Panorama IA</button>
+      <button data-tab="insights">💰 Insights</button>
+      <button data-tab="live">📊 Ao Vivo</button>
+    </div>
+
+    <!-- Abas de Conteúdo -->
+    <div id="tab-panorama" class="tab-content active">
+      <div class="panel" id="conteudo-panorama">
+        <p style="text-align: center; color: var(--muted); font-weight: bold;">
+          A IA está analisando este confronto taticamente... ⏳
+        </p>
+      </div>
+    </div>
+    
+    <div id="tab-insights" class="tab-content">
+      <div class="panel" id="conteudo-insights">
+        <p style="text-align: center; color: var(--muted); font-weight: bold;">
+          Buscando tendências de apostas... ⏳
+        </p>
+      </div>
+    </div>
+
+    <div id="tab-live" class="tab-content">
+      <div class="panel" id="conteudo-live">
+        <p style="text-align: center; color: var(--muted); font-weight: bold;">
+          Estatísticas ao vivo carregarão aqui.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let jogosGlobal = [];
+
+// Funções Utilitárias de Data
+const formatarData = (isoStr) => {
+  const d = new Date(isoStr);
+  return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '');
+};
+const formatarHora = (isoStr) => {
+  const d = new Date(isoStr);
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+};
+const pegarDataLocal = (isoStr) => new Date(isoStr).toLocaleDateString('pt-BR');
+
+// Carrega os dados gerados pelo GitHub Actions
+async function carregarVitrine() {
+  try {
+    const res = await fetch(`dados/vitrine.json?v=${Date.now()}`);
+    if (!res.ok) throw new Error("Sem vitrine");
+    const data = await res.json();
+    jogosGlobal = data.jogos;
+    renderizarJogos("todos");
+  } catch (error) {
+    document.getElementById('lista-jogos').innerHTML = 
+      `<div class="loading" style="color:var(--gold);">Agenda ainda não gerada ou erro ao carregar.<br>Verifique o GitHub Actions!</div>`;
   }
-  $("#palpites").innerHTML=html;
-  document.querySelectorAll('#palpites .pv-modo').forEach(b=>b.onclick=()=>{pvModo=b.dataset.m;renderPalpites();});
-  document.querySelectorAll('#palpites .rodtabs button[data-r]').forEach(b=>b.onclick=()=>{pvRod=+b.dataset.r;renderPalpites();});
-  document.querySelectorAll('#palpites .rodtabs button[data-p]').forEach(b=>b.onclick=()=>{pvPessoa=b.dataset.p;renderPalpites();});
 }
-/* ── TELA DE BOAS-VINDAS ───────────────────────────────────────────── */
-let PERFIL = null; // nome real (Matheus, Felipe...) ou "Visitante"
-let VULGO  = '';   // apelido livre
 
-function initWelcome(){
-  // cards
-  document.querySelectorAll('.wlc-card').forEach(card=>{
-    card.addEventListener('click',()=>{
-      document.querySelectorAll('.wlc-card').forEach(c=>c.classList.remove('sel'));
-      card.classList.add('sel');
-      PERFIL = card.dataset.perfil;
-      // pré-preenche o vulgo com o nome real só se o campo estiver vazio
-      const inp = document.getElementById('wlcVulgo');
-      if(!inp.value.trim()) inp.value = PERFIL==='Visitante'? '' : PERFIL;
-      inp.focus(); inp.select();
-      checkBtn();
-    });
+// Renderiza a lista de jogos na tela inicial
+function renderizarJogos(filtroDia) {
+  const container = document.getElementById('lista-jogos');
+  container.innerHTML = "";
+  
+  const hojeStr = new Date().toLocaleDateString('pt-BR');
+  let ontem = new Date(); ontem.setDate(ontem.getDate() - 1);
+  const ontemStr = ontem.toLocaleDateString('pt-BR');
+  let amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+  const amanhaStr = amanha.toLocaleDateString('pt-BR');
+
+  let dataAtual = "";
+
+  const jogosFiltrados = jogosGlobal.filter(j => {
+    const dataJogo = pegarDataLocal(j.dataHora);
+    if (filtroDia === "hoje") return dataJogo === hojeStr;
+    if (filtroDia === "ontem") return dataJogo === ontemStr;
+    if (filtroDia === "amanha") return dataJogo === amanhaStr;
+    return true; // "todos"
   });
-  // vulgo input
-  document.getElementById('wlcVulgo').addEventListener('input', checkBtn);
-  // botão entrar
-  document.getElementById('wlcEntrar').addEventListener('click', entrarSite);
-  // atalho admin
-  document.getElementById('wlcAdmin').addEventListener('click', ()=>{
-    const senha = prompt('Senha do admin:');
-    if(senha !== SENHA) return;
-    document.getElementById('welcome').classList.add('hidden');
-    openAdmin();
-  });
-}
 
-function checkBtn(){
-  const ok = PERFIL && document.getElementById('wlcVulgo').value.trim();
-  document.getElementById('wlcEntrar').classList.toggle('on', !!ok);
-}
-
-function entrarSite(){
-  if(!PERFIL || !document.getElementById('wlcVulgo').value.trim()) return;
-  VULGO = document.getElementById('wlcVulgo').value.trim();
-  localStorage.setItem('bolao_perfil', PERFIL);
-  localStorage.setItem('bolao_vulgo', VULGO);
-  document.getElementById('welcome').classList.add('hidden');
-  // atualiza o campo pnome do palpitar (usado no montar())
-  const pnome = document.getElementById('pnome');
-  if(pnome) pnome.value = VULGO;
-}
-
-function tryAutoLogin(){
-  const p = localStorage.getItem('bolao_perfil');
-  const v = localStorage.getItem('bolao_vulgo');
-  if(p && v){
-    PERFIL = p; VULGO = v;
-    // Pre-fill the welcome screen so it's ready if they visit again
-    const card = document.querySelector(`.wlc-card[data-perfil="${p}"]`);
-    if(card){ card.classList.add('sel'); }
-    document.getElementById('wlcVulgo').value = v;
-    document.getElementById('welcome').classList.add('hidden');
-    const pnome = document.getElementById('pnome');
-    if(pnome) pnome.value = v;
+  if (jogosFiltrados.length === 0) {
+    container.innerHTML = `<div class="loading">Nenhum jogo encontrado para esta data.</div>`;
+    return;
   }
+
+  jogosFiltrados.forEach(j => {
+    const dataJogo = formatarData(j.dataHora);
+    if (dataJogo !== dataAtual) {
+      container.innerHTML += `<div class="day"><span class="dot"></span><span class="d">${dataJogo}</span><span class="line"></span></div>`;
+      dataAtual = dataJogo;
+    }
+
+    // Traduzindo status da API
+    let stHtml = `<span class="st pend">A iniciar</span>`;
+    let scoreHtml = `<div class="score pend">${formatarHora(j.dataHora)}</div>`;
+    
+    if (['IN_PLAY', 'PAUSED', 'LIVE'].includes(j.status)) {
+      stHtml = `<span class="st live">Ao Vivo</span>`;
+      scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
+    } else if (['FINISHED', 'AWARDED'].includes(j.status)) {
+      stHtml = `<span class="st enc">Encerrado</span>`;
+      scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
+    }
+
+    const card = `
+      <div class="match" onclick="abrirJogo('${j.id}')">
+        <div class="match-top">
+          <span class="grp"><img src="${j.competicaoLogo}" alt=""> ${j.competicao}</span>
+          ${stHtml}
+        </div>
+        <div class="teams">
+          <div class="team">
+            <img src="${j.casa.escudo}" alt="${j.casa.nome}">
+            <span class="nm">${j.casa.nome}</span>
+          </div>
+          ${scoreHtml}
+          <div class="team">
+            <img src="${j.fora.escudo}" alt="${j.fora.nome}">
+            <span class="nm">${j.fora.nome}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML += card;
+  });
 }
 
-boot();
-initWelcome();
-tryAutoLogin();
-</script></body></html>
+// Navegação SPA
+function abrirJogo(id) {
+  const jogo = jogosGlobal.find(j => String(j.id) === String(id));
+  if (!jogo) return;
+
+  // Esconde Vitrine, Mostra Partida
+  document.getElementById('view-vitrine').classList.remove('active');
+  document.getElementById('view-partida').classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+
+  // Monta o Header do Jogo copiando o visual do card
+  let scoreText = ['FINISHED', 'IN_PLAY', 'PAUSED'].includes(jogo.status) 
+    ? `${jogo.casa.placar} - ${jogo.fora.placar}` 
+    : formatarHora(jogo.dataHora);
+
+  document.getElementById('partida-header').innerHTML = `
+    <div class="match" style="cursor: default; transform: none; box-shadow: none;">
+       <div style="text-align:center; font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 10px;">
+          ${jogo.competicao} · ${formatarData(jogo.dataHora)}
+       </div>
+       <div class="teams">
+          <div class="team"><img src="${jogo.casa.escudo}"><span class="nm">${jogo.casa.nome}</span></div>
+          <div class="score">${scoreText}</div>
+          <div class="team"><img src="${jogo.fora.escudo}"><span class="nm">${jogo.fora.nome}</span></div>
+        </div>
+    </div>
+  `;
+
+  // AQUI É ONDE VAI ENTRAR A MÁGICA DA IA DEPOIS!
+  console.log(`Disparar fetch para o Cloudflare Worker pedindo análise do jogo ${id}...`);
+}
+
+function voltarParaVitrine() {
+  document.getElementById('view-partida').classList.remove('active');
+  document.getElementById('view-vitrine').classList.add('active');
+  
+  // Reseta as abas para o padrão (Panorama) ao fechar
+  document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
+  document.querySelector('#tabs-partida button[data-tab="panorama"]').classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-panorama').classList.add('active');
+}
+
+// Event Listeners (Filtros e Abas)
+document.querySelectorAll('#filtros button').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('#filtros button').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    renderizarJogos(e.target.dataset.dia);
+  });
+});
+
+document.querySelectorAll('#tabs-partida button').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${e.target.dataset.tab}`).classList.add('active');
+  });
+});
+
+// Inicialização
+carregarVitrine();
+</script>
+</body>
+</html>
