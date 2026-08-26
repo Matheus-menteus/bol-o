@@ -804,8 +804,57 @@ function abrirJogo(id) {
     </div>
   `;
 
-  // AQUI É ONDE VAI ENTRAR A MÁGICA DA IA DEPOIS!
-  console.log(`Disparar fetch para o Cloudflare Worker pedindo análise do jogo ${id}...`);
+  // Dentro da função abrirJogo(id), APÓS a montagem do header:
+  
+  // 1. Reseta os textos para o "Loading..."
+  document.getElementById('conteudo-panorama').innerHTML = '<p style="text-align: center; color: var(--muted); font-weight: bold;">A IA está analisando este confronto taticamente... ⏳</p>';
+  document.getElementById('conteudo-insights').innerHTML = '<p style="text-align: center; color: var(--muted); font-weight: bold;">Buscando tendências... ⏳</p>';
+  document.getElementById('conteudo-live').innerHTML = '<p style="text-align: center; color: var(--muted); font-weight: bold;">Carregando estatísticas... ⏳</p>';
+
+  // 2. Chama a nossa Serverless Function (A Vercel entende a rota /api/ automaticamente)
+  fetch(`/api/analise?jogoId=${id}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById('conteudo-panorama').innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
+        return;
+      }
+
+      // Preenche a Aba 1: Panorama
+      document.getElementById('conteudo-panorama').innerHTML = `
+        <p style="line-height: 1.6; font-size: 14px;">${data.panorama.replace(/\n/g, '<br>')}</p>
+      `;
+
+      // Preenche a Aba 2: Insights
+      // A IA vai mandar em bullet points, então formatamos direitinho:
+      const insightsHtml = data.insights.split('\n').map(linha => {
+        if (linha.trim() === '') return '';
+        return `<li style="margin-bottom: 10px; line-height: 1.5; font-size: 14px;">${linha.replace(/^-\s*/, '')}</li>`;
+      }).join('');
+      
+      document.getElementById('conteudo-insights').innerHTML = `
+        <ul style="padding-left: 20px; color: var(--gold);">${insightsHtml}</ul>
+      `;
+
+      // Preenche a Aba 3: Ao Vivo
+      const stats = data.liveStats;
+      const arbitro = stats.referees && stats.referees.length > 0 ? stats.referees[0].name : 'Não informado';
+      
+      document.getElementById('conteudo-live').innerHTML = `
+        <div style="font-size: 13px; line-height: 1.8;">
+          <p><b>Estádio:</b> ${stats.venue || 'Não informado'}</p>
+          <p><b>Árbitro:</b> ${arbitro}</p>
+          <p><b>Rodada:</b> ${stats.matchday || '-'}</p>
+          <hr style="border: 0; border-top: 1px solid var(--line); margin: 15px 0;">
+          <p style="text-align:center; color: var(--muted);">
+            <i>Em breve: Gráficos de posse de bola, chutes e faltas via estatísticas ao vivo.</i>
+          </p>
+        </div>
+      `;
+    })
+    .catch(err => {
+      document.getElementById('conteudo-panorama').innerHTML = '<p style="color: red;">Falha ao conectar com o servidor.</p>';
+    });
 }
 
 function voltarParaVitrine() {
