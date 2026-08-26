@@ -154,6 +154,8 @@ h1 .thin { display:block; font-size:13px; font-weight:600; letter-spacing:.16em;
 
 <script>
 let jogosGlobal = [];
+let iaCarregada = false;
+let jogoAtualId = null;
 
 // Funções Utilitárias de Data
 const formatarData = (isoStr) => {
@@ -217,10 +219,11 @@ function renderizarJogos(filtroDia) {
     let stHtml = `<span class="st pend">A iniciar</span>`;
     let scoreHtml = `<div class="score pend">${formatarHora(j.dataHora)}</div>`;
     
-    if (['IN_PLAY', 'PAUSED', 'LIVE'].includes(j.status)) {
+    // Status adaptados para a API-Football
+    if (['1H', '2H', 'HT', 'ET', 'P', 'BT', 'LIVE'].includes(j.status)) {
       stHtml = `<span class="st live">Ao Vivo</span>`;
       scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
-    } else if (['FINISHED', 'AWARDED'].includes(j.status)) {
+    } else if (['FT', 'AET', 'PEN'].includes(j.status)) {
       stHtml = `<span class="st enc">Encerrado</span>`;
       scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
     }
@@ -248,10 +251,13 @@ function renderizarJogos(filtroDia) {
   });
 }
 
-// Navegação SPA
+// Navegação SPA e Lazy Loading da IA
 function abrirJogo(id) {
   const jogo = jogosGlobal.find(j => String(j.id) === String(id));
   if (!jogo) return;
+  
+  jogoAtualId = id;
+  iaCarregada = false; // Garante que a IA não foi disparada ainda para este jogo
 
   // Esconde Vitrine, Mostra Partida
   document.getElementById('view-vitrine').classList.remove('active');
@@ -259,7 +265,7 @@ function abrirJogo(id) {
   window.scrollTo({top: 0, behavior: 'smooth'});
 
   // Monta o Header do Jogo copiando o visual do card
-  let scoreText = ['FINISHED', 'IN_PLAY', 'PAUSED'].includes(jogo.status) 
+  let scoreText = ['FT', 'AET', 'PEN', '1H', 'HT', '2H', 'ET', 'LIVE'].includes(jogo.status) 
     ? `${jogo.casa.placar} - ${jogo.fora.placar}` 
     : formatarHora(jogo.dataHora);
 
@@ -276,75 +282,73 @@ function abrirJogo(id) {
     </div>
   `;
 
-// Dentro da função abrirJogo(id), APÓS a montagem do header:
-  
-  // 1. Reseta os textos para o "Loading..."
-  document.getElementById('conteudo-panorama').innerHTML = '<p style="text-align: center; color: var(--muted); font-weight: bold;">A IA está analisando este confronto taticamente... ⏳</p>';
-  document.getElementById('conteudo-insights').innerHTML = '<p style="text-align: center; color: var(--muted); font-weight: bold;">Buscando tendências... ⏳</p>';
-  document.getElementById('conteudo-live').innerHTML = '<p style="text-align: center; color: var(--muted); font-weight: bold;">Carregando estatísticas... ⏳</p>';
+  // Reseta as abas e ativa a "Ao Vivo" como padrão
+  document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
+  document.querySelector('#tabs-partida button[data-tab="live"]').classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-live').classList.add('active');
 
-  // 2. Chama a nossa Serverless Function (A Vercel entende a rota /api/ automaticamente)
-  fetch(`/api/analise?jogoId=${id}`)
-    .then(response => response.json())
+  // Avisos de carregamento
+  document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">⏳ Clique na aba para gerar a análise com IA</div>';
+  document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para gerar insights com IA</div>';
+  document.getElementById('conteudo-live').innerHTML = '<div class="loading">Buscando estatísticas da partida...</div>';
+
+  // Dispara SOMENTE a busca de estatísticas para a aba Ao Vivo
+  fetch(`/api/analise?jogoId=${id}&acao=stats`)
+    .then(res => res.json())
     .then(data => {
-      if (data.error) {
-        document.getElementById('conteudo-panorama').innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
-        return;
-      }
+       if(data.error) {
+         document.getElementById('conteudo-live').innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar estatísticas.</p>';
+         return;
+       }
+       const fix = data.liveStats.fixture;
+       const stats = data.liveStats.statistics;
+       
+       let htmlStats = `
+          <div style="text-align:center; font-size: 13px; margin-bottom:20px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
+            <p><b>Estádio:</b> ${fix.venue.name || 'Não informado'} | <b>Árbitro:</b> ${fix.referee || '-'}</p>
+          </div>
+       `;
 
-      // Preenche a Aba 1: Panorama
-      document.getElementById('conteudo-panorama').innerHTML = `
-        <p style="line-height: 1.6; font-size: 14px;">${data.panorama.replace(/\n/g, '<br>')}</p>
-      `;
+       // Se a API retornou estatísticas do jogo (geralmente durante ou após o jogo)
+       if (stats && stats.length > 1) {
+          const hStats = stats[0].statistics;
+          const aStats = stats[1].statistics;
+          const pegaDado = (arr, tipo) => arr.find(s => s.type === tipo)?.value || 0;
 
-      // Preenche a Aba 2: Insights
-      // A IA vai mandar em bullet points, então formatamos direitinho:
-    // Preenche a Aba 2: Insights
-      // Verifica se a IA mandou um Array (lista) ou uma String com quebras de linha
-      const arrayInsights = Array.isArray(data.insights) ? data.insights : data.insights.split('\n');
-      
-      const insightsHtml = arrayInsights.map(linha => {
-        if (linha.trim() === '') return '';
-        return `<li style="margin-bottom: 10px; line-height: 1.5; font-size: 14px;">${linha.replace(/^-\s*/, '')}</li>`;
-      }).join('');
-      
-      document.getElementById('conteudo-insights').innerHTML = `
-        <ul style="padding-left: 20px; color: var(--gold);">${insightsHtml}</ul>
-      `;
-
-      // Preenche a Aba 3: Ao Vivo
-      const stats = data.liveStats;
-      const arbitro = stats.referees && stats.referees.length > 0 ? stats.referees[0].name : 'Não informado';
-      
-      document.getElementById('conteudo-live').innerHTML = `
-        <div style="font-size: 13px; line-height: 1.8;">
-          <p><b>Estádio:</b> ${stats.venue || 'Não informado'}</p>
-          <p><b>Árbitro:</b> ${arbitro}</p>
-          <p><b>Rodada:</b> ${stats.matchday || '-'}</p>
-          <hr style="border: 0; border-top: 1px solid var(--line); margin: 15px 0;">
-          <p style="text-align:center; color: var(--muted);">
-            <i>Em breve: Gráficos de posse de bola, chutes e faltas via estatísticas ao vivo.</i>
-          </p>
-        </div>
-      `;
+          htmlStats += `
+            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+               <span style="color:var(--teal)">${pegaDado(hStats, "Ball Possession")}</span>
+               <span style="color:var(--muted)">Posse de Bola</span>
+               <span style="color:var(--teal)">${pegaDado(aStats, "Ball Possession")}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+               <span style="color:var(--teal)">${pegaDado(hStats, "Total Shots")}</span>
+               <span style="color:var(--muted)">Finalizações</span>
+               <span style="color:var(--teal)">${pegaDado(aStats, "Total Shots")}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+               <span style="color:var(--teal)">${pegaDado(hStats, "Fouls")}</span>
+               <span style="color:var(--muted)">Faltas</span>
+               <span style="color:var(--teal)">${pegaDado(aStats, "Fouls")}</span>
+            </div>
+          `;
+       } else {
+          htmlStats += `<p style="text-align:center; color: var(--muted);">Estatísticas aprofundadas ficarão disponíveis durante o jogo.</p>`;
+       }
+       document.getElementById('conteudo-live').innerHTML = htmlStats;
     })
     .catch(err => {
-      document.getElementById('conteudo-panorama').innerHTML = '<p style="color: red;">Falha ao conectar com o servidor.</p>';
+       document.getElementById('conteudo-live').innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
     });
 }
 
 function voltarParaVitrine() {
   document.getElementById('view-partida').classList.remove('active');
   document.getElementById('view-vitrine').classList.add('active');
-  
-  // Reseta as abas para o padrão (Panorama) ao fechar
-  document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
-  document.querySelector('#tabs-partida button[data-tab="panorama"]').classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.getElementById('tab-panorama').classList.add('active');
 }
 
-// Event Listeners (Filtros e Abas)
+// Filtros da vitrine
 document.querySelectorAll('#filtros button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('#filtros button').forEach(b => b.classList.remove('active'));
@@ -353,13 +357,48 @@ document.querySelectorAll('#filtros button').forEach(btn => {
   });
 });
 
+// Listener que Dispara a IA apenas quando a aba for clicada
 document.querySelectorAll('#tabs-partida button').forEach(btn => {
   btn.addEventListener('click', (e) => {
+    const tabClicada = e.target.dataset.tab;
+    
+    // Gerencia UI das Abas
     document.querySelectorAll('#tabs-partida button').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
-    
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`tab-${e.target.dataset.tab}`).classList.add('active');
+    document.getElementById(`tab-${tabClicada}`).classList.add('active');
+
+    // O LAZY LOADING: Se clicou em IA e ainda não carregou, dispara a requisição!
+    if ((tabClicada === 'panorama' || tabClicada === 'insights') && !iaCarregada) {
+       iaCarregada = true; // Trava para não chamar de novo
+       document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">A IA está decifrando as táticas deste jogo... ⏳</div>';
+       document.getElementById('conteudo-insights').innerHTML = '<div class="loading">Buscando as melhores tendências... ⏳</div>';
+
+       fetch(`/api/analise?jogoId=${jogoAtualId}&acao=ia`)
+         .then(res => res.json())
+         .then(data => {
+            if(data.error) throw new Error(data.error);
+            // Preenche Panorama
+            document.getElementById('conteudo-panorama').innerHTML = `<p style="line-height: 1.6; font-size: 14px;">${data.panorama.replace(/\n/g, '<br>')}</p>`;
+
+            // Preenche Insights com fonte escura e bolinhas douradas
+            const arrayInsights = Array.isArray(data.insights) ? data.insights : data.insights.split('\n');
+            const insightsHtml = arrayInsights.map(linha => {
+              if (linha.trim() === '') return '';
+              return `<li style="margin-bottom: 12px; line-height: 1.5; font-size: 14px; color: var(--ink);">
+                        <span style="color: var(--gold); font-weight: 900; margin-right: 6px;">•</span> 
+                        ${linha.replace(/^-\s*/, '')}
+                      </li>`;
+            }).join('');
+            
+            document.getElementById('conteudo-insights').innerHTML = `<ul style="padding-left: 0; list-style-type: none; margin: 0;">${insightsHtml}</ul>`;
+         })
+         .catch(err => {
+            document.getElementById('conteudo-panorama').innerHTML = '<p style="color: red; text-align: center;">Falha ao conectar com a Inteligência Artificial.</p>';
+            document.getElementById('conteudo-insights').innerHTML = '<p style="color: red; text-align: center;">Falha ao gerar insights.</p>';
+            iaCarregada = false; // Libera para tentar de novo caso clique em outra aba e volte
+         });
+    }
   });
 });
 
