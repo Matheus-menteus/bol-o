@@ -286,30 +286,84 @@ function abrirJogo(id) {
   document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">⏳ Clique na aba para gerar a análise com IA</div>';
   document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para gerar insights com IA</div>';
   
-  // Chama a nova função com o botão de atualizar
-  buscarEstatisticas(id);
-}
 
-// Função de buscar estatísticas (com o botão de atualizar)
+// Função de buscar estatísticas (Placar, Minutos, Gols, Cartões e Atualizar)
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
-  container.innerHTML = '<div class="loading">Buscando estatísticas atualizadas... ⏳</div>';
+  container.innerHTML = '<div class="loading">Buscando dados em tempo real... ⏳</div>';
 
   fetch(`/api/analise?jogoId=${id}&acao=stats`)
     .then(res => res.json())
     .then(data => {
        if(data.error) {
-         container.innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar estatísticas.</p>';
+         container.innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar dados.</p>';
          return;
        }
+       
        const fix = data.liveStats.fixture;
        const stats = data.liveStats.statistics;
+       const gols = data.liveStats.goals;
+       const liga = data.liveStats.league;
+       const eventos = data.liveStats.events || []; // Puxa os eventos do jogo
        
+       // --- 1. ATUALIZA O CABEÇALHO (PLACAR E MINUTO REAL) ---
+       let statusTempo = fix.status.short;
+       if (fix.status.elapsed && ['1H', '2H', 'HT', 'ET', 'LIVE'].includes(fix.status.short)) {
+           statusTempo = `<span style="color: #ef4444; animation: pulse 2s infinite;">${fix.status.elapsed}'</span>`;
+       } else if (['FT', 'AET', 'PEN'].includes(fix.status.short)) {
+           statusTempo = "Encerrado";
+       } else {
+           statusTempo = formatarHora(fix.date);
+       }
+
+       document.getElementById('partida-header').innerHTML = `
+         <div class="match" style="cursor: default; transform: none; box-shadow: none;">
+            <div style="text-align:center; font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 10px;">
+               ${liga.name} · ${statusTempo}
+            </div>
+            <div class="teams">
+               <div class="team"><img src="${data.liveStats.teams.home.logo}"><span class="nm">${data.liveStats.teams.home.name}</span></div>
+               <div class="score">${gols.home ?? 0}<span>-</span>${gols.away ?? 0}</div>
+               <div class="team"><img src="${data.liveStats.teams.away.logo}"><span class="nm">${data.liveStats.teams.away.name}</span></div>
+             </div>
+         </div>
+       `;
+
+       // --- 2. FILTRA OS GOLS E CARTÕES ---
+       let htmlEventos = '';
+       const golsECartoes = eventos.filter(e => e.type === "Goal" || e.type === "Card");
+       
+       if (golsECartoes.length > 0) {
+           htmlEventos = `<div style="margin-bottom: 20px; font-size: 13px; line-height: 1.8; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+                            <h4 style="margin: 0 0 10px 0; font-size: 11px; color: var(--muted); text-transform: uppercase;">Eventos da Partida</h4>`;
+           
+           golsECartoes.forEach(e => {
+               let icone = "⚽";
+               if (e.type === "Goal" && e.detail === "Missed Penalty") icone = "❌";
+               if (e.type === "Card" && e.detail.includes("Yellow")) icone = "🟨";
+               if (e.type === "Card" && e.detail.includes("Red")) icone = "🟥";
+
+               // Junta o tempo (ex: 45+2')
+               const tempo = e.time.elapsed + (e.time.extra ? `+${e.time.extra}` : '') + "'";
+               const jogador = e.player.name || "Jogador";
+               const timeNome = e.team.name;
+
+               htmlEventos += `<div>${icone} <b>${tempo}</b> - ${jogador} <span style="color: var(--muted); font-size: 11px;">(${timeNome})</span></div>`;
+           });
+           htmlEventos += `</div>`;
+       } else if (['1H', '2H', 'HT', 'LIVE', 'FT'].includes(fix.status.short)) {
+           htmlEventos = `<p style="text-align:center; font-size: 13px; color: var(--muted);">Nenhum gol ou cartão registrado ainda.</p>`;
+       }
+
+       // --- 3. MONTA A TELA DE ESTATÍSTICAS ---
        let htmlStats = `
-          <div style="text-align:center; font-size: 13px; margin-bottom:20px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
+          <div style="text-align:center; font-size: 13px; margin-bottom:15px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
             <p><b>Estádio:</b> ${fix.venue.name || 'Não informado'} | <b>Árbitro:</b> ${fix.referee || '-'}</p>
           </div>
        `;
+
+       // Injeta a lista de gols e cartões logo abaixo do estádio
+       htmlStats += htmlEventos;
 
        if (stats && stats.length > 1) {
           const hStats = stats[0].statistics;
@@ -317,7 +371,7 @@ function buscarEstatisticas(id) {
           const pegaDado = (arr, tipo) => arr.find(s => s.type === tipo)?.value || 0;
 
           htmlStats += `
-            <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:14px; font-weight:bold;">
+            <div style="display:flex; justify-content:space-between; margin-top:15px; font-size:14px; font-weight:bold;">
                <span style="color:var(--teal)">${pegaDado(hStats, "Ball Possession")}</span>
                <span style="color:var(--muted)">Posse de Bola</span>
                <span style="color:var(--teal)">${pegaDado(aStats, "Ball Possession")}</span>
@@ -334,7 +388,7 @@ function buscarEstatisticas(id) {
             </div>
           `;
        } else {
-          htmlStats += `<p style="text-align:center; color: var(--muted);">Estatísticas aprofundadas ficarão disponíveis durante o jogo.</p>`;
+          htmlStats += `<p style="text-align:center; font-size: 13px; color: var(--muted); margin-top: 15px;">Estatísticas aprofundadas ficarão disponíveis durante o jogo.</p>`;
        }
 
        htmlStats += `
@@ -351,7 +405,6 @@ function buscarEstatisticas(id) {
        container.innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
     });
 }
-
 function voltarParaVitrine() {
   document.getElementById('view-partida').classList.remove('active');
   document.getElementById('view-vitrine').classList.add('active');
