@@ -168,12 +168,41 @@ const formatarHora = (isoStr) => {
 };
 const pegarDataLocal = (isoStr) => new Date(isoStr).toLocaleDateString('pt-BR');
 
-// Carrega os dados da Vitrine
+// -------------------------------------------------------------
+// NOVO: SALVAR NO PEN DRIVE DO NAVEGADOR (LocalStorage)
+// -------------------------------------------------------------
+function salvarMemoriaNoNavegador() {
+  // Converte nossa memória global em texto e salva no navegador
+  localStorage.setItem('futebolHubMemoria', JSON.stringify(jogosGlobal));
+}
+
+// Carrega os dados da Vitrine + Memória Local
 async function carregarVitrine() {
   try {
     const res = await fetch(`dados/vitrine.json?v=${Date.now()}`);
     if (!res.ok) throw new Error("Sem vitrine");
-    const data = await res.json();
+    let data = await res.json();
+    
+    // --- NOVO: LENDO A MEMÓRIA DO NAVEGADOR ---
+    const memoriaSalva = localStorage.getItem('futebolHubMemoria');
+    if (memoriaSalva) {
+        const memoriaParseada = JSON.parse(memoriaSalva);
+        
+        // Vamos varrer os jogos do GitHub e injetar os dados salvos do navegador neles
+        data.jogos = data.jogos.map(jogoNovo => {
+            const jogoLembrado = memoriaParseada.find(j => String(j.id) === String(jogoNovo.id));
+            if (jogoLembrado) {
+                // Se a gente lembra desse jogo, restaura o placar, status e a IA gerada!
+                if (jogoLembrado.status) jogoNovo.status = jogoLembrado.status;
+                if (jogoLembrado.casa?.placar !== undefined) jogoNovo.casa.placar = jogoLembrado.casa.placar;
+                if (jogoLembrado.fora?.placar !== undefined) jogoNovo.fora.placar = jogoLembrado.fora.placar;
+                if (jogoLembrado.iaCache) jogoNovo.iaCache = jogoLembrado.iaCache;
+            }
+            return jogoNovo;
+        });
+    }
+    // ------------------------------------------
+
     jogosGlobal = data.jogos;
     renderizarJogos("todos");
   } catch (error) {
@@ -283,14 +312,13 @@ function abrirJogo(id) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-live').classList.add('active');
 
-  // Deixa o aviso amigável para o usuário
   document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">⏳ Clique na aba para carregar a análise da IA</div>';
   document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para carregar as tendências</div>';
   
   buscarEstatisticas(id);
 }
 
-// Busca Estatísticas e Timeline Dividida
+// Busca Estatísticas
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
   container.innerHTML = '<div class="loading">Buscando dados em tempo real... ⏳</div>';
@@ -309,12 +337,16 @@ function buscarEstatisticas(id) {
        const liga = data.liveStats.league;
        const eventos = data.liveStats.events || []; 
        
+       // --- ATUALIZA A MEMÓRIA E SALVA NO NAVEGADOR ---
        const indexJogo = jogosGlobal.findIndex(j => String(j.id) === String(id));
        if (indexJogo !== -1) {
            jogosGlobal[indexJogo].status = fix.status.short;
            jogosGlobal[indexJogo].casa.placar = gols.home ?? 0;
            jogosGlobal[indexJogo].fora.placar = gols.away ?? 0;
+           
+           salvarMemoriaNoNavegador(); // Chama nossa nova função de backup!
        }
+       // ----------------------------------------------
 
        let statusTempo = fix.status.short;
        if (fix.status.elapsed && ['1H', '2H', 'HT', 'ET', 'LIVE'].includes(fix.status.short)) {
@@ -429,12 +461,7 @@ function buscarEstatisticas(id) {
     });
 }
 
-// -------------------------------------------------------------
-// BLOCO IA: RENDERIZAÇÃO E BUSCA COM CACHE
-// -------------------------------------------------------------
-
 function renderizarIA(panorama, insights, id) {
-  // Injeta o texto e um botão discreto embaixo para forçar a atualização
   document.getElementById('conteudo-panorama').innerHTML = 
     `<p style="line-height: 1.6; font-size: 14px;">${panorama.replace(/\n/g, '<br>')}</p>
      <div style="text-align: center; margin-top: 25px; border-top: 1px solid var(--line); padding-top: 15px;">
@@ -467,13 +494,13 @@ function buscarIA(id) {
     .then(data => {
        if(data.error) throw new Error(data.error);
        
-       // Salva a resposta no cache do nosso site
        const index = jogosGlobal.findIndex(j => String(j.id) === String(id));
        if (index !== -1) {
            jogosGlobal[index].iaCache = { panorama: data.panorama, insights: data.insights };
+           
+           salvarMemoriaNoNavegador(); // Salva a IA no Pen Drive invisível!
        }
        
-       // Renderiza na tela
        renderizarIA(data.panorama, data.insights, id);
     })
     .catch(err => {
@@ -482,10 +509,6 @@ function buscarIA(id) {
        iaCarregada = false; 
     });
 }
-
-// -------------------------------------------------------------
-// EVENTOS DE CLIQUE E VOLTAR
-// -------------------------------------------------------------
 
 function voltarParaVitrine() {
   const filtroAtivo = document.querySelector('#filtros button.active').dataset.dia;
@@ -503,7 +526,7 @@ document.querySelectorAll('#filtros button').forEach(btn => {
   });
 });
 
-// Listener das Abas (Agora com o Cache inteligente)
+// Listener das Abas
 document.querySelectorAll('#tabs-partida button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const tabClicada = e.target.dataset.tab;
@@ -517,12 +540,10 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
        
        const jogo = jogosGlobal.find(j => String(j.id) === String(jogoAtualId));
        
-       // Se o cache existir, renderiza instantaneamente sem gastar tokens!
        if (jogo && jogo.iaCache) {
            renderizarIA(jogo.iaCache.panorama, jogo.iaCache.insights, jogoAtualId);
            iaCarregada = true;
        } else {
-           // Se for a primeira vez, busca na IA
            buscarIA(jogoAtualId);
        }
     }
