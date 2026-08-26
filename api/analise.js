@@ -1,75 +1,69 @@
-// Arquivo: api/analise.js
-
 export default async function handler(req, res) {
-  // Configuração de CORS (caso o HTML fique no GitHub Pages e a API na Vercel)
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { jogoId } = req.query;
-  if (!jogoId) {
-    return res.status(400).json({ error: 'O ID do jogo é obrigatório.' });
-  }
+  const { jogoId, acao } = req.query;
+  if (!jogoId) return res.status(400).json({ error: 'ID obrigatório.' });
 
   try {
-    // 1. Busca os dados super atualizados (ao vivo) da football-data
-    const fdReq = await fetch(`https://api.football-data.org/v4/matches/${jogoId}`, {
-      headers: { 'X-Auth-Token': process.env.FD_TOKEN }
+    // 1. Busca os dados reais e estatísticas na API-Football
+    const fdReq = await fetch(`https://v3.football.api-sports.io/fixtures?id=${jogoId}`, {
+      headers: { 'x-apisports-key': process.env.API_FOOTBALL_KEY }
     });
-    
-    if (!fdReq.ok) throw new Error('Erro ao buscar dados na API de Futebol');
-    const matchData = await fdReq.json();
+    const dataApi = await fdReq.json();
+    const matchData = dataApi.response[0];
+    if (!matchData) throw new Error('Jogo não encontrado');
 
-    // 2. Prepara o contexto da partida para o Gemini
-    const casa = matchData.homeTeam.shortName || matchData.homeTeam.name;
-    const fora = matchData.awayTeam.shortName || matchData.awayTeam.name;
-    const competicao = matchData.competition.name;
-    const placar = `${matchData.score.fullTime.home ?? 0} x ${matchData.score.fullTime.away ?? 0}`;
-    const status = matchData.status;
+    // Se a requisição for só para abrir a aba "Ao Vivo", paramos por aqui e não gastamos tokens da IA!
+    if (acao === 'stats') {
+       return res.status(200).json({ liveStats: matchData });
+    }
 
-    // Prompt engessado para garantir que a IA responda sempre no mesmo formato
-    const prompt = `Atue como um analista tático de futebol de alto nível.
+    // 2. Se a ação for 'ia', preparamos o contexto e chamamos o Gemini
+    const casa = matchData.teams.home.name;
+    const fora = matchData.teams.away.name;
+    const competicao = matchData.league.name;
+    const placar = `${matchData.goals.home ?? 0} x ${matchData.goals.away ?? 0}`;
+    const status = matchData.fixture.status.long;
+
+    // Envia a posse de bola para a IA ser mais precisa na análise
+    let contextoTatico = "";
+    if (matchData.statistics && matchData.statistics.length > 0) {
+       const posseCasa = matchData.statistics[0].statistics.find(s => s.type === "Ball Possession")?.value || "50%";
+       contextoTatico = `Tática em tempo real: ${casa} está com ${posseCasa} de posse de bola.`;
+    }
+
+    const prompt = `Atue como um analista tático de futebol.
     Jogo: ${casa} vs ${fora} (${competicao})
-    Status: ${status}
-    Placar Atual/Final: ${placar}
+    Status: ${status} | Placar: ${placar}
+    ${contextoTatico}
 
-    Retorne APENAS um objeto JSON com esta estrutura (sem formatação markdown por fora):
+    Retorne APENAS um objeto JSON com esta estrutura (sem markdown por fora):
     {
-      "panorama": "Escreva 2 parágrafos curtos analisando o contexto deste jogo (fase dos times, importância do confronto ou resumo do que aconteceu se já acabou).",
-      "insights": "Escreva 3 bullet points curtos com tendências, dicas de apostas (ex: over/under gols, escanteios) ou estatísticas chave."
+      "panorama": "Escreva 2 parágrafos analisando o contexto deste jogo (fase, táticas ou resumo se já acabou).",
+      "insights": ["Insight 1 focado em tendência ou aposta", "Insight 2", "Insight 3"]
     }`;
 
-    // 3. Chama a API do Gemini (usando o modelo Flash, que é absurdamente rápido e barato/gratuito)
     const geminiReq = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        // Forçamos a IA a cuspir um JSON limpo e válido!
-        generationConfig: { response_mime_type: "application/json" } 
+        generationConfig: { response_mime_type: "application/json" }
       })
     });
 
-    if (!geminiReq.ok) throw new Error('Erro na API do Gemini');
     const geminiData = await geminiReq.json();
-    
-    // Pega o texto da resposta e converte de volta para objeto JS
     const iaResponse = JSON.parse(geminiData.candidates[0].content.parts[0].text);
 
-    // 4. Devolve o "pacotão" pronto pro seu Frontend!
-    return res.status(200).json({
-      liveStats: matchData,        // Dados crus para você usar na aba "Ao Vivo"
-      panorama: iaResponse.panorama,
-      insights: iaResponse.insights
-    });
+    return res.status(200).json({ panorama: iaResponse.panorama, insights: iaResponse.insights });
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Erro interno ao processar a análise tática.' });
+    return res.status(500).json({ error: 'Erro interno no servidor.' });
   }
 }
