@@ -200,7 +200,7 @@ function renderizarJogos(filtroDia) {
     if (filtroDia === "hoje") return dataJogo === hojeStr;
     if (filtroDia === "ontem") return dataJogo === ontemStr;
     if (filtroDia === "amanha") return dataJogo === amanhaStr;
-    return true; // "todos"
+    return true; 
   });
 
   if (jogosFiltrados.length === 0) {
@@ -249,7 +249,7 @@ function renderizarJogos(filtroDia) {
   });
 }
 
-// Navegação SPA
+// Navegação SPA e Abertura do Jogo
 function abrirJogo(id) {
   const jogo = jogosGlobal.find(j => String(j.id) === String(id));
   if (!jogo) return;
@@ -265,10 +265,11 @@ function abrirJogo(id) {
     ? `${jogo.casa.placar} - ${jogo.fora.placar}` 
     : formatarHora(jogo.dataHora);
 
+  // Header temporário (será reescrito ao vivo pela API)
   document.getElementById('partida-header').innerHTML = `
     <div class="match" style="cursor: default; transform: none; box-shadow: none;">
        <div style="text-align:center; font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 10px;">
-          ${jogo.competicao} · ${formatarData(jogo.dataHora)}
+          ${jogo.competicao} · Carregando...
        </div>
        <div class="teams">
           <div class="team"><img src="${jogo.casa.escudo}"><span class="nm">${jogo.casa.nome}</span></div>
@@ -284,10 +285,14 @@ function abrirJogo(id) {
   document.getElementById('tab-live').classList.add('active');
 
   document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">⏳ Clique na aba para gerar a análise com IA</div>';
-  document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para gerar insights com IA</div>';
+  document.getElementById('conteudo-insights').innerHTML = '<div class="loading">⏳ Clique na aba para gerar tendências com IA</div>';
   
+  buscarEstatisticas(id);
+}
 
-// Função de buscar estatísticas (Placar, Minutos, Gols, Cartões e Atualizar)
+// -------------------------------------------------------------
+// NOVA FUNÇÃO SUPER TURBINADA (Eventos, Cartões, Gols e Minutos)
+// -------------------------------------------------------------
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
   container.innerHTML = '<div class="loading">Buscando dados em tempo real... ⏳</div>';
@@ -304,7 +309,7 @@ function buscarEstatisticas(id) {
        const stats = data.liveStats.statistics;
        const gols = data.liveStats.goals;
        const liga = data.liveStats.league;
-       const eventos = data.liveStats.events || []; // Puxa os eventos do jogo
+       const eventos = data.liveStats.events || []; 
        
        // --- 1. ATUALIZA O CABEÇALHO (PLACAR E MINUTO REAL) ---
        let statusTempo = fix.status.short;
@@ -343,7 +348,6 @@ function buscarEstatisticas(id) {
                if (e.type === "Card" && e.detail.includes("Yellow")) icone = "🟨";
                if (e.type === "Card" && e.detail.includes("Red")) icone = "🟥";
 
-               // Junta o tempo (ex: 45+2')
                const tempo = e.time.elapsed + (e.time.extra ? `+${e.time.extra}` : '') + "'";
                const jogador = e.player.name || "Jogador";
                const timeNome = e.team.name;
@@ -362,7 +366,6 @@ function buscarEstatisticas(id) {
           </div>
        `;
 
-       // Injeta a lista de gols e cartões logo abaixo do estádio
        htmlStats += htmlEventos;
 
        if (stats && stats.length > 1) {
@@ -405,6 +408,7 @@ function buscarEstatisticas(id) {
        container.innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
     });
 }
+
 function voltarParaVitrine() {
   document.getElementById('view-partida').classList.remove('active');
   document.getElementById('view-vitrine').classList.add('active');
@@ -419,7 +423,7 @@ document.querySelectorAll('#filtros button').forEach(btn => {
   });
 });
 
-// IA click listener
+// Listener da Inteligência Artificial
 document.querySelectorAll('#tabs-partida button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const tabClicada = e.target.dataset.tab;
@@ -430,7 +434,7 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
     document.getElementById(`tab-${tabClicada}`).classList.add('active');
 
     if ((tabClicada === 'panorama' || tabClicada === 'insights') && !iaCarregada) {
-       iaCarregada = true;
+       iaCarregada = true; 
        document.getElementById('conteudo-panorama').innerHTML = '<div class="loading">A IA está decifrando as táticas deste jogo... ⏳</div>';
        document.getElementById('conteudo-insights').innerHTML = '<div class="loading">Buscando as melhores tendências... ⏳</div>';
 
@@ -438,6 +442,7 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
          .then(res => res.json())
          .then(data => {
             if(data.error) throw new Error(data.error);
+            
             document.getElementById('conteudo-panorama').innerHTML = `<p style="line-height: 1.6; font-size: 14px;">${data.panorama.replace(/\n/g, '<br>')}</p>`;
 
             const arrayInsights = Array.isArray(data.insights) ? data.insights : data.insights.split('\n');
@@ -454,13 +459,12 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
          .catch(err => {
             document.getElementById('conteudo-panorama').innerHTML = '<p style="color: red; text-align: center;">Falha ao conectar com a Inteligência Artificial.</p>';
             document.getElementById('conteudo-insights').innerHTML = '<p style="color: red; text-align: center;">Falha ao gerar insights.</p>';
-            iaCarregada = false;
+            iaCarregada = false; 
          });
     }
   });
 });
 
-// Inicialização
 carregarVitrine();
 </script>
 </body>
