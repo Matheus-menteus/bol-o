@@ -1,100 +1,78 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 
-const TOKEN = process.env.FD_TOKEN;
+// ATENÇÃO: Agora usaremos a variável API_FOOTBALL_KEY
+const TOKEN = process.env.API_FOOTBALL_KEY;
 const VITRINE_PATH = "dados/vitrine.json";
 
-// Códigos oficiais da football-data.org para as ligas solicitadas
-// PL: Premier League, FL1: Ligue 1, PD: La Liga, BL1: Bundesliga, SA: Serie A
-// CL: Champions, EL: Europa League, ECL: Conference League
-// BSA: Brasileirão, CLI: Libertadores
-const COMPETICOES = ["PL", "FL1", "PD", "BL1", "SA", "CL", "EL", "ECL", "BSA", "CLI"];
+// IDs oficiais das Ligas na API-Football
+// 39: Premier, 61: Ligue 1, 140: La Liga, 78: Bundesliga, 135: Serie A
+// 2: Champions, 3: Europa, 843: Conference, 71: Brasileirão, 13: Libertadores
+const LIGAS = [39, 61, 140, 78, 135, 2, 3, 843, 71, 13];
 
-// Função para dar uma pequena pausa e não estourar o limite da API (rate limit)
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 async function main() {
   if (!TOKEN) {
-    console.error("ERRO: Defina a variável FD_TOKEN.");
+    console.error("ERRO: Defina a variável API_FOOTBALL_KEY.");
     process.exit(1);
   }
 
-  // Define a janela de tempo: Ontem, Hoje e os próximos 3 dias
-  const hoje = new Date();
-  const ontem = new Date(hoje);
-  ontem.setDate(ontem.getDate() - 1);
-  const diasFrente = new Date(hoje);
-  diasFrente.setDate(diasFrente.getDate() + 3);
-
-  const fmtData = (d) => d.toISOString().split("T")[0];
-  const dateFrom = fmtData(ontem);
-  const dateTo = fmtData(diasFrente);
-
-  console.log(`Buscando jogos de ${dateFrom} até ${dateTo}...`);
+  // Define os dias: Ontem, Hoje, Amanhã e Depois de Amanhã
+  const datas = [];
+  for (let i = -1; i <= 2; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    datas.push(d.toISOString().split("T")[0]);
+  }
 
   let todosOsJogos = [];
 
-  for (const comp of COMPETICOES) {
-    console.log(`Buscando: ${comp}...`);
+  for (const data of datas) {
+    console.log(`Buscando jogos do dia ${data}...`);
     try {
-      const url = `https://api.football-data.org/v4/competitions/${comp}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`;
-      const resp = await fetch(url, { headers: { "X-Auth-Token": TOKEN } });
+      const resp = await fetch(`https://v3.football.api-sports.io/fixtures?date=${data}`, {
+        headers: { "x-apisports-key": TOKEN }
+      });
 
-      if (resp.status === 403) {
-        console.warn(`⚠️ Sem permissão no plano gratuito para a liga: ${comp}`);
-      } else if (!resp.ok) {
-        console.error(`❌ Erro na liga ${comp}: ${resp.status}`);
-      } else {
-        const data = await resp.json();
-        const matches = data.matches || [];
-        
-        // Limpando o JSON para guardar só o que o front-end vai precisar
-        const jogosLimpos = matches.map((m) => ({
-          id: m.id,
-          competicao: data.competition.name,
-          competicaoLogo: data.competition.emblem,
-          dataHora: m.utcDate,
-          status: m.status, // TIMED, IN_PLAY, FINISHED...
-          casa: {
-            nome: m.homeTeam.shortName || m.homeTeam.name,
-            escudo: m.homeTeam.crest,
-            placar: m.score.fullTime.home,
-          },
-          fora: {
-            nome: m.awayTeam.shortName || m.awayTeam.name,
-            escudo: m.awayTeam.crest,
-            placar: m.score.fullTime.away,
-          },
-        }));
+      if (!resp.ok) continue;
+      const json = await resp.json();
+      const matches = json.response || [];
 
-        todosOsJogos.push(...jogosLimpos);
-        console.log(`✅ ${comp}: ${jogosLimpos.length} jogos encontrados.`);
-      }
+      // Filtra apenas os jogos das ligas que nós queremos
+      const jogosFiltrados = matches.filter(m => LIGAS.includes(m.league.id));
+
+      const jogosLimpos = jogosFiltrados.map((m) => ({
+        id: m.fixture.id,
+        competicao: m.league.name,
+        competicaoLogo: m.league.logo,
+        dataHora: m.fixture.date,
+        status: m.fixture.status.short, // FT, NS, 1H, HT...
+        casa: {
+          nome: m.teams.home.name,
+          escudo: m.teams.home.logo,
+          placar: m.goals.home
+        },
+        fora: {
+          nome: m.teams.away.name,
+          escudo: m.teams.away.logo,
+          placar: m.goals.away
+        }
+      }));
+
+      todosOsJogos.push(...jogosLimpos);
+      console.log(`✅ ${jogosLimpos.length} jogos salvos para ${data}.`);
     } catch (err) {
-      console.error(`Erro ao processar ${comp}:`, err.message);
+      console.error(`Erro:`, err.message);
     }
-
-    // Pausa de 1.5 segundos para respeitar o limite de 10 requests/minuto
-    await delay(1500);
+    await delay(1000); // Pausa para não estourar o limite da API
   }
 
-  // Ordenar todos os jogos por data e hora
   todosOsJogos.sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+  if (!existsSync("dados")) await mkdir("dados");
 
-  // Garante que a pasta "dados" existe
-  if (!existsSync("dados")) {
-    await mkdir("dados");
-  }
-
-  // Salva o JSON enxuto no repositório
-  const dadosFinais = {
-    atualizadoEm: new Date().toISOString(),
-    totalJogos: todosOsJogos.length,
-    jogos: todosOsJogos,
-  };
-
-  await writeFile(VITRINE_PATH, JSON.stringify(dadosFinais, null, 2) + "\n");
-  console.log(`\n🎉 Sucesso! vitrine.json gerada com ${todosOsJogos.length} jogos.`);
+  await writeFile(VITRINE_PATH, JSON.stringify({ atualizadoEm: new Date().toISOString(), jogos: todosOsJogos }, null, 2) + "\n");
+  console.log(`\n🎉 vitrine.json gerada com ${todosOsJogos.length} jogos.`);
 }
 
 main();
