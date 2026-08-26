@@ -18,35 +18,58 @@ export default async function handler(req, res) {
     const matchData = dataApi.response[0];
     if (!matchData) throw new Error('Jogo não encontrado');
 
-    // Se a requisição for só para abrir a aba "Ao Vivo", paramos por aqui e não gastamos tokens da IA!
+    // Se for só aba de estatísticas, não consome tokens da IA
     if (acao === 'stats') {
        return res.status(200).json({ liveStats: matchData });
     }
 
-    // 2. Se a ação for 'ia', preparamos o contexto e chamamos o Gemini
+    // 2. Extrai dados do confronto
     const casa = matchData.teams.home.name;
     const fora = matchData.teams.away.name;
     const competicao = matchData.league.name;
     const placar = `${matchData.goals.home ?? 0} x ${matchData.goals.away ?? 0}`;
     const status = matchData.fixture.status.long;
+    const tempoJogo = matchData.fixture.status.elapsed ? `${matchData.fixture.status.elapsed}'` : 'Pré-jogo';
 
-    // Envia a posse de bola para a IA ser mais precisa na análise
-    let contextoTatico = "";
-    if (matchData.statistics && matchData.statistics.length > 0) {
-       const posseCasa = matchData.statistics[0].statistics.find(s => s.type === "Ball Possession")?.value || "50%";
-       contextoTatico = `Tática em tempo real: ${casa} está com ${posseCasa} de posse de bola.`;
+    // Extrai métricas para embasar os mercados de apostas
+    let contextoEstatisticas = "Estatísticas em tempo real ainda não disponíveis (confronto pré-jogo).";
+    if (matchData.statistics && matchData.statistics.length > 1) {
+       const hStats = matchData.statistics[0].statistics;
+       const aStats = matchData.statistics[1].statistics;
+       const pegaDado = (arr, tipo) => arr.find(s => s.type === tipo)?.value || 0;
+
+       contextoEstatisticas = `
+       - Posse de Bola: ${casa} ${pegaDado(hStats, "Ball Possession")} vs ${pegaDado(aStats, "Ball Possession")} ${fora}
+       - Finalizações no Gol: ${casa} ${pegaDado(hStats, "Shots on Goal")} vs ${pegaDado(aStats, "Shots on Goal")} ${fora}
+       - Total de Chutes: ${casa} ${pegaDado(hStats, "Total Shots")} vs ${pegaDado(aStats, "Total Shots")} ${fora}
+       - Faltas: ${casa} ${pegaDado(hStats, "Fouls")} vs ${pegaDado(aStats, "Fouls")} ${fora}
+       - Escanteios: ${casa} ${pegaDado(hStats, "Corner Kicks")} vs ${pegaDado(aStats, "Corner Kicks")} ${fora}
+       `;
     }
 
-    const prompt = `Atue como um analista tático de futebol.
-    Jogo: ${casa} vs ${fora} (${competicao})
-    Status: ${status} | Placar: ${placar}
-    ${contextoTatico}
+    // Prompt com foco analítico e mercados de apostas
+    const prompt = `Você é um analista tático sênior focado em probabilidade e mercados de apostas esportivas.
+Analise a partida a seguir:
+Partida: ${casa} vs ${fora}
+Competição: ${competicao}
+Momento: ${status} (${tempoJogo})
+Placar Atual: ${placar}
+Métricas de Jogo:
+${contextoEstatisticas}
 
-    Retorne APENAS um objeto JSON com esta estrutura (sem markdown por fora):
-    {
-      "panorama": "Escreva 2 parágrafos analisando o contexto deste jogo (fase, táticas ou resumo se já acabou).",
-      "insights": ["Insight 1 focado em tendência ou aposta", "Insight 2", "Insight 3"]
-    }`;
+Diretrizes da análise:
+1. "panorama": 2 parágrafos curtos explicando o momento das equipes, a proposta de jogo de cada lado e como o ritmo da partida favorece ou desfavorece gols/espaços.
+2. "insights": Retorne exatamente 3 bullet points objetivos focados em mercados de apostas (ex: Linhas de Gols Over/Under, Ambas Marcam, Escanteios ou Cartões). Justifique cada um com base no padrão tático ou nos números de pressão/chutes/faltas informados.
+
+Retorne EXCLUSIVAMENTE um JSON válido com esta estrutura:
+{
+  "panorama": "Texto com 2 parágrafos.",
+  "insights": [
+    "Mercado 1: justificativa técnica e tática",
+    "Mercado 2: justificativa técnica e tática",
+    "Mercado 3: justificativa técnica e tática"
+  ]
+}`;
 
     const geminiReq = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
@@ -64,6 +87,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Erro interno no servidor.' });
+    return res.status(500).json({ error: 'Erro interno ao processar análise da IA.' });
   }
 }
