@@ -299,7 +299,11 @@ function abrirJogo(id) {
 
       // Preenche a Aba 2: Insights
       // A IA vai mandar em bullet points, então formatamos direitinho:
-      const insightsHtml = data.insights.split('\n').map(linha => {
+    // Preenche a Aba 2: Insights
+      // Verifica se a IA mandou um Array (lista) ou uma String com quebras de linha
+      const arrayInsights = Array.isArray(data.insights) ? data.insights : data.insights.split('\n');
+      
+      const insightsHtml = arrayInsights.map(linha => {
         if (linha.trim() === '') return '';
         return `<li style="margin-bottom: 10px; line-height: 1.5; font-size: 14px;">${linha.replace(/^-\s*/, '')}</li>`;
       }).join('');
