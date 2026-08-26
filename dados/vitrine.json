@@ -1,5 +1,5 @@
 {
-  "atualizadoEm": "2026-08-26T18:40:02.421Z",
+  "atualizadoEm": "2026-08-26T18:44:44.317Z",
   "jogos": [
     {
       "id": 1622626,
@@ -67,6 +67,23 @@
         "nome": "NEC Nijmegen",
         "escudo": "https://media.api-sports.io/football/teams/413.png",
         "placar": 0
+      }
+    },
+    {
+      "id": 1623069,
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
+      "dataHora": "2026-08-26T00:00:00+00:00",
+      "status": "FT",
+      "casa": {
+        "nome": "Cruzeiro",
+        "escudo": "https://media.api-sports.io/football/teams/135.png",
+        "placar": 1
+      },
+      "fora": {
+        "nome": "Atletico-MG",
+        "escudo": "https://media.api-sports.io/football/teams/1062.png",
+        "placar": 1
       }
     },
     {
@@ -168,6 +185,40 @@
       "fora": {
         "nome": "Dinamo Zagreb",
         "escudo": "https://media.api-sports.io/football/teams/620.png",
+        "placar": null
+      }
+    },
+    {
+      "id": 1623071,
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
+      "dataHora": "2026-08-27T00:30:00+00:00",
+      "status": "NS",
+      "casa": {
+        "nome": "Palmeiras",
+        "escudo": "https://media.api-sports.io/football/teams/121.png",
+        "placar": null
+      },
+      "fora": {
+        "nome": "Santos",
+        "escudo": "https://media.api-sports.io/football/teams/128.png",
+        "placar": null
+      }
+    },
+    {
+      "id": 1623072,
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
+      "dataHora": "2026-08-27T00:30:00+00:00",
+      "status": "NS",
+      "casa": {
+        "nome": "Vasco DA Gama",
+        "escudo": "https://media.api-sports.io/football/teams/133.png",
+        "placar": null
+      },
+      "fora": {
+        "nome": "Vitoria",
+        "escudo": "https://media.api-sports.io/football/teams/136.png",
         "placar": null
       }
     },
@@ -406,6 +457,23 @@
       "fora": {
         "nome": "Athletic Club",
         "escudo": "https://media.api-sports.io/football/teams/531.png",
+        "placar": null
+      }
+    },
+    {
+      "id": 1623070,
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
+      "dataHora": "2026-08-27T23:00:00+00:00",
+      "status": "NS",
+      "casa": {
+        "nome": "Internacional",
+        "escudo": "https://media.api-sports.io/football/teams/119.png",
+        "placar": null
+      },
+      "fora": {
+        "nome": "Gremio",
+        "escudo": "https://media.api-sports.io/football/teams/130.png",
         "placar": null
       }
     }
