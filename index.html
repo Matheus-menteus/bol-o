@@ -289,7 +289,7 @@ function abrirJogo(id) {
   buscarEstatisticas(id);
 }
 
-// Busca Estatísticas e Atualiza Memória Global
+// Busca Estatísticas, Atualiza Memória Global e cria a Timeline
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
   container.innerHTML = '<div class="loading">Buscando dados em tempo real... ⏳</div>';
@@ -308,14 +308,13 @@ function buscarEstatisticas(id) {
        const liga = data.liveStats.league;
        const eventos = data.liveStats.events || []; 
        
-       // --- ATUALIZA A MEMÓRIA GLOBAL (Para a Tela Inicial) ---
+       // --- ATUALIZA A MEMÓRIA GLOBAL ---
        const indexJogo = jogosGlobal.findIndex(j => String(j.id) === String(id));
        if (indexJogo !== -1) {
            jogosGlobal[indexJogo].status = fix.status.short;
            jogosGlobal[indexJogo].casa.placar = gols.home ?? 0;
            jogosGlobal[indexJogo].fora.placar = gols.away ?? 0;
        }
-       // -------------------------------------------------------
 
        // Atualiza o Cabeçalho da Partida
        let statusTempo = fix.status.short;
@@ -340,14 +339,19 @@ function buscarEstatisticas(id) {
          </div>
        `;
 
-       // Filtra Eventos (Gols e Cartões)
+       // --- 2. FILTRA OS GOLS E CARTÕES (NOVO LAYOUT TIMELINE) ---
        let htmlEventos = '';
-       const golsECartoes = eventos.filter(e => e.type === "Goal" || e.type === "Card");
+       
+       // O .reverse() inverte a ordem: Os minutos mais recentes ficam no topo!
+       const golsECartoes = eventos.filter(e => e.type === "Goal" || e.type === "Card").reverse();
        
        if (golsECartoes.length > 0) {
-           htmlEventos = `<div style="margin-bottom: 20px; font-size: 13px; line-height: 1.8; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
-                            <h4 style="margin: 0 0 10px 0; font-size: 11px; color: var(--muted); text-transform: uppercase;">Eventos da Partida</h4>`;
+           htmlEventos = `<div style="margin-bottom: 20px; font-size: 13px; line-height: 1.8; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                            <h4 style="margin: 0 0 15px 0; font-size: 11px; color: var(--muted); text-transform: uppercase; text-align: center;">Eventos da Partida</h4>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">`;
            
+           const idCasa = data.liveStats.teams.home.id; // Guarda o ID do mandante
+
            golsECartoes.forEach(e => {
                let icone = "⚽";
                if (e.type === "Goal" && e.detail === "Missed Penalty") icone = "❌";
@@ -356,23 +360,39 @@ function buscarEstatisticas(id) {
 
                const tempo = e.time.elapsed + (e.time.extra ? `+${e.time.extra}` : '') + "'";
                const jogador = e.player.name || "Jogador";
-               const timeNome = e.team.name;
 
-               htmlEventos += `<div>${icone} <b>${tempo}</b> - ${jogador} <span style="color: var(--muted); font-size: 11px;">(${timeNome})</span></div>`;
+               // Verifica se o evento foi do time da casa (Esquerda) ou de fora (Direita)
+               if (e.team.id === idCasa) {
+                   htmlEventos += `
+                     <div style="display: flex; width: 100%;">
+                        <div style="width: 50%; text-align: right; padding-right: 15px; border-right: 1px solid var(--line);">
+                           ${jogador} ${icone} <b style="color:var(--teal); margin-left:5px;">${tempo}</b>
+                        </div>
+                        <div style="width: 50%;"></div>
+                     </div>`;
+               } else {
+                   htmlEventos += `
+                     <div style="display: flex; width: 100%;">
+                        <div style="width: 50%; border-right: 1px solid var(--line);"></div>
+                        <div style="width: 50%; text-align: left; padding-left: 15px; margin-left: -1px; border-left: 1px solid var(--line);">
+                           <b style="color:var(--teal); margin-right:5px;">${tempo}</b> ${icone} ${jogador}
+                        </div>
+                     </div>`;
+               }
            });
-           htmlEventos += `</div>`;
+           htmlEventos += `</div></div>`;
        } else if (['1H', '2H', 'HT', 'LIVE', 'FT'].includes(fix.status.short)) {
            htmlEventos = `<p style="text-align:center; font-size: 13px; color: var(--muted);">Nenhum gol ou cartão registrado ainda.</p>`;
        }
 
-       // Tela de Estatísticas
+       // --- 3. MONTA A TELA DE ESTATÍSTICAS ---
        let htmlStats = `
           <div style="text-align:center; font-size: 13px; margin-bottom:15px; border-bottom: 1px solid var(--line); padding-bottom: 10px;">
             <p><b>Estádio:</b> ${fix.venue.name || 'Não informado'} | <b>Árbitro:</b> ${fix.referee || '-'}</p>
           </div>
        `;
 
-       htmlStats += htmlEventos;
+       htmlStats += htmlEventos; // Injeta a nova Timeline dividida aqui
 
        if (stats && stats.length > 1) {
           const hStats = stats[0].statistics;
@@ -414,7 +434,6 @@ function buscarEstatisticas(id) {
        container.innerHTML = '<p style="color: red; text-align: center;">Falha ao carregar estatísticas.</p>';
     });
 }
-
 // Voltar re-renderizando a tela inicial
 function voltarParaVitrine() {
   // Descobre qual filtro (Ontem, Hoje, Amanhã...) está selecionado
