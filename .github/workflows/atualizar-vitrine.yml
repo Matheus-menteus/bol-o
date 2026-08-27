@@ -16,7 +16,7 @@ jobs:
 
       - name: Buscar jogos das Ligas e gerar vitrine
         env:
-          FD_TOKEN: ${{ secrets.FD_TOKEN }}
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: node scripts/gerar-vitrine.mjs
 
       - name: Commit se mudou
