@@ -1,18 +1,20 @@
 {
-  "atualizadoEm": "2026-08-28T08:51:58.180Z",
+  "atualizadoEm": "2026-08-28T13:54:01.564Z",
   "jogos": [
     {
       "id": 1623071,
-      "competicao": "Copa Do Brasil",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
       "dataHora": "2026-08-27T00:30:00+00:00",
       "status": "FT",
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
       "casa": {
+        "id": 121,
         "nome": "Palmeiras",
         "escudo": "https://media.api-sports.io/football/teams/121.png",
         "placar": 3
       },
       "fora": {
+        "id": 128,
         "nome": "Santos",
         "escudo": "https://media.api-sports.io/football/teams/128.png",
         "placar": 0
@@ -20,16 +22,18 @@
     },
     {
       "id": 1623072,
-      "competicao": "Copa Do Brasil",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
       "dataHora": "2026-08-27T00:30:00+00:00",
       "status": "FT",
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
       "casa": {
+        "id": 133,
         "nome": "Vasco DA Gama",
         "escudo": "https://media.api-sports.io/football/teams/133.png",
         "placar": 1
       },
       "fora": {
+        "id": 136,
         "nome": "Vitoria",
         "escudo": "https://media.api-sports.io/football/teams/136.png",
         "placar": 0
@@ -37,16 +41,18 @@
     },
     {
       "id": 1623443,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T16:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 3683,
         "nome": "Ararat-Armenia",
         "escudo": "https://media.api-sports.io/football/teams/3683.png",
         "placar": 1
       },
       "fora": {
+        "id": 632,
         "nome": "Universitatea Craiova",
         "escudo": "https://media.api-sports.io/football/teams/632.png",
         "placar": 0
@@ -54,16 +60,18 @@
     },
     {
       "id": 1623446,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T16:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 3502,
         "nome": "FC Iberia 1999",
         "escudo": "https://media.api-sports.io/football/teams/3502.png",
         "placar": 1
       },
       "fora": {
+        "id": 336,
         "nome": "Jagiellonia",
         "escudo": "https://media.api-sports.io/football/teams/336.png",
         "placar": 2
@@ -71,16 +79,18 @@
     },
     {
       "id": 1622633,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T17:00:00+00:00",
       "status": "AET",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 567,
         "nome": "Plzen",
         "escudo": "https://media.api-sports.io/football/teams/567.png",
         "placar": 5
       },
       "fora": {
+        "id": 598,
         "nome": "FK Crvena Zvezda",
         "escudo": "https://media.api-sports.io/football/teams/598.png",
         "placar": 1
@@ -88,16 +98,18 @@
     },
     {
       "id": 1623447,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T17:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 3872,
         "nome": "Kauno Žalgiris",
         "escudo": "https://media.api-sports.io/football/teams/3872.png",
         "placar": 1
       },
       "fora": {
+        "id": 549,
         "nome": "Beşiktaş",
         "escudo": "https://media.api-sports.io/football/teams/549.png",
         "placar": 0
@@ -105,16 +117,18 @@
     },
     {
       "id": 1623448,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T17:00:00+00:00",
       "status": "AET",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 321,
         "nome": "Lillestrom",
         "escudo": "https://media.api-sports.io/football/teams/321.png",
         "placar": 2
       },
       "fora": {
+        "id": 3327,
         "nome": "Egnatia Rrogozhinë",
         "escudo": "https://media.api-sports.io/football/teams/3327.png",
         "placar": 1
@@ -122,16 +136,18 @@
     },
     {
       "id": 1623449,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T17:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 3402,
         "nome": "Omonia Nicosia",
         "escudo": "https://media.api-sports.io/football/teams/3402.png",
         "placar": 4
       },
       "fora": {
+        "id": 735,
         "nome": "St. Truiden",
         "escudo": "https://media.api-sports.io/football/teams/735.png",
         "placar": 2
@@ -139,16 +155,18 @@
     },
     {
       "id": 1623450,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T17:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 571,
         "nome": "Red Bull Salzburg",
         "escudo": "https://media.api-sports.io/football/teams/571.png",
         "placar": 3
       },
       "fora": {
+        "id": 2240,
         "nome": "Mjallby AIF",
         "escudo": "https://media.api-sports.io/football/teams/2240.png",
         "placar": 0
@@ -156,16 +174,18 @@
     },
     {
       "id": 1623441,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T18:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 406,
         "nome": "Aarhus",
         "escudo": "https://media.api-sports.io/football/teams/406.png",
         "placar": 1
       },
       "fora": {
+        "id": 211,
         "nome": "Benfica",
         "escudo": "https://media.api-sports.io/football/teams/211.png",
         "placar": 3
@@ -173,16 +193,18 @@
     },
     {
       "id": 1623444,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T18:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 853,
         "nome": "CSKA Sofia",
         "escudo": "https://media.api-sports.io/football/teams/853.png",
         "placar": 0
       },
       "fora": {
+        "id": 1124,
         "nome": "OFI",
         "escudo": "https://media.api-sports.io/football/teams/1124.png",
         "placar": 2
@@ -190,16 +212,18 @@
     },
     {
       "id": 1627596,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T18:00:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 1012,
         "nome": "FC Thun",
         "escudo": "https://media.api-sports.io/football/teams/1012.png",
         "placar": 2
       },
       "fora": {
+        "id": 347,
         "nome": "Lech Poznan",
         "escudo": "https://media.api-sports.io/football/teams/347.png",
         "placar": 2
@@ -207,16 +231,18 @@
     },
     {
       "id": 1570336,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-27T18:30:00+00:00",
       "status": "FT",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 538,
         "nome": "Celta Vigo",
         "escudo": "https://media.api-sports.io/football/teams/538.png",
         "placar": 1
       },
       "fora": {
+        "id": 727,
         "nome": "Osasuna",
         "escudo": "https://media.api-sports.io/football/teams/727.png",
         "placar": 2
@@ -224,16 +250,18 @@
     },
     {
       "id": 1623442,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T18:30:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 554,
         "nome": "Anderlecht",
         "escudo": "https://media.api-sports.io/football/teams/554.png",
         "placar": 3
       },
       "fora": {
+        "id": 664,
         "nome": "Kairat Almaty",
         "escudo": "https://media.api-sports.io/football/teams/664.png",
         "placar": 0
@@ -241,16 +269,18 @@
     },
     {
       "id": 1623445,
-      "competicao": "UEFA Europa League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "dataHora": "2026-08-27T18:30:00+00:00",
       "status": "FT",
+      "competicao": "UEFA Europa League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/3.png",
       "casa": {
+        "id": 651,
         "nome": "Ferencvarosi TC",
         "escudo": "https://media.api-sports.io/football/teams/651.png",
         "placar": 4
       },
       "fora": {
+        "id": 998,
         "nome": "Trabzonspor",
         "escudo": "https://media.api-sports.io/football/teams/998.png",
         "placar": 0
@@ -258,16 +288,18 @@
     },
     {
       "id": 1570335,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-27T19:00:00+00:00",
       "status": "FT",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 529,
         "nome": "Barcelona",
         "escudo": "https://media.api-sports.io/football/teams/529.png",
         "placar": 2
       },
       "fora": {
+        "id": 531,
         "nome": "Athletic Club",
         "escudo": "https://media.api-sports.io/football/teams/531.png",
         "placar": 0
@@ -275,16 +307,18 @@
     },
     {
       "id": 1623070,
-      "competicao": "Copa Do Brasil",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
       "dataHora": "2026-08-27T23:00:00+00:00",
       "status": "FT",
+      "competicao": "Copa Do Brasil",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/73.png",
       "casa": {
+        "id": 119,
         "nome": "Internacional",
         "escudo": "https://media.api-sports.io/football/teams/119.png",
         "placar": 0
       },
       "fora": {
+        "id": 130,
         "nome": "Gremio",
         "escudo": "https://media.api-sports.io/football/teams/130.png",
         "placar": 0
@@ -292,512 +326,572 @@
     },
     {
       "id": 1570359,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-28T17:00:00+00:00",
       "status": "NS",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 4665,
         "nome": "Racing Santander",
         "escudo": "https://media.api-sports.io/football/teams/4665.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 797,
         "nome": "Elche",
         "escudo": "https://media.api-sports.io/football/teams/797.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575140,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-28T18:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 157,
         "nome": "Bayern München",
         "escudo": "https://media.api-sports.io/football/teams/157.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 172,
         "nome": "VfB Stuttgart",
         "escudo": "https://media.api-sports.io/football/teams/172.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1550097,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "dataHora": "2026-08-28T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "casa": {
+        "id": 489,
         "nome": "AC Milan",
         "escudo": "https://media.api-sports.io/football/teams/489.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 517,
         "nome": "Venezia",
         "escudo": "https://media.api-sports.io/football/teams/517.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1552746,
-      "competicao": "Ligue 1",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "dataHora": "2026-08-28T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Ligue 1",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "casa": {
+        "id": 79,
         "nome": "Lille",
         "escudo": "https://media.api-sports.io/football/teams/79.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 85,
         "nome": "Paris Saint Germain",
         "escudo": "https://media.api-sports.io/football/teams/85.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1557381,
-      "competicao": "Premier League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "dataHora": "2026-08-28T19:00:00+00:00",
       "status": "NS",
+      "competicao": "Premier League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "casa": {
+        "id": 52,
         "nome": "Crystal Palace",
         "escudo": "https://media.api-sports.io/football/teams/52.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 50,
         "nome": "Manchester City",
         "escudo": "https://media.api-sports.io/football/teams/50.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1570353,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-28T19:30:00+00:00",
       "status": "NS",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 542,
         "nome": "Alaves",
         "escudo": "https://media.api-sports.io/football/teams/542.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 533,
         "nome": "Villarreal",
         "escudo": "https://media.api-sports.io/football/teams/533.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1557383,
-      "competicao": "Premier League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "dataHora": "2026-08-29T11:30:00+00:00",
       "status": "NS",
+      "competicao": "Premier League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "casa": {
+        "id": 40,
         "nome": "Liverpool",
         "escudo": "https://media.api-sports.io/football/teams/40.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 65,
         "nome": "Nottingham Forest",
         "escudo": "https://media.api-sports.io/football/teams/65.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575143,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-29T13:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 1660,
         "nome": "SV Elversberg",
         "escudo": "https://media.api-sports.io/football/teams/1660.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 168,
         "nome": "Bayer Leverkusen",
         "escudo": "https://media.api-sports.io/football/teams/168.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575144,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-29T13:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 192,
         "nome": "1. FC Köln",
         "escudo": "https://media.api-sports.io/football/teams/192.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 167,
         "nome": "1899 Hoffenheim",
         "escudo": "https://media.api-sports.io/football/teams/167.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575146,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-29T13:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 164,
         "nome": "FSV Mainz 05",
         "escudo": "https://media.api-sports.io/football/teams/164.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 185,
         "nome": "SC Paderborn 07",
         "escudo": "https://media.api-sports.io/football/teams/185.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575147,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-29T13:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 173,
         "nome": "RB Leipzig",
         "escudo": "https://media.api-sports.io/football/teams/173.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 163,
         "nome": "Borussia Mönchengladbach",
         "escudo": "https://media.api-sports.io/football/teams/163.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575148,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-29T13:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 182,
         "nome": "Union Berlin",
         "escudo": "https://media.api-sports.io/football/teams/182.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 169,
         "nome": "Eintracht Frankfurt",
         "escudo": "https://media.api-sports.io/football/teams/169.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1557378,
-      "competicao": "Premier League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "dataHora": "2026-08-29T14:00:00+00:00",
       "status": "NS",
+      "competicao": "Premier League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "casa": {
+        "id": 35,
         "nome": "Bournemouth",
         "escudo": "https://media.api-sports.io/football/teams/35.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 45,
         "nome": "Everton",
         "escudo": "https://media.api-sports.io/football/teams/45.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1557380,
-      "competicao": "Premier League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "dataHora": "2026-08-29T14:00:00+00:00",
       "status": "NS",
+      "competicao": "Premier League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "casa": {
+        "id": 1346,
         "nome": "Coventry",
         "escudo": "https://media.api-sports.io/football/teams/1346.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 64,
         "nome": "Hull City",
         "escudo": "https://media.api-sports.io/football/teams/64.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1570357,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-29T15:00:00+00:00",
       "status": "NS",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 539,
         "nome": "Levante",
         "escudo": "https://media.api-sports.io/football/teams/539.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 543,
         "nome": "Real Betis",
         "escudo": "https://media.api-sports.io/football/teams/543.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1552745,
-      "competicao": "Ligue 1",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "dataHora": "2026-08-29T15:15:00+00:00",
       "status": "NS",
+      "competicao": "Ligue 1",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "casa": {
+        "id": 95,
         "nome": "Strasbourg",
         "escudo": "https://media.api-sports.io/football/teams/95.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 116,
         "nome": "Lens",
         "escudo": "https://media.api-sports.io/football/teams/116.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1550100,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "dataHora": "2026-08-29T16:30:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "casa": {
+        "id": 502,
         "nome": "Fiorentina",
         "escudo": "https://media.api-sports.io/football/teams/502.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 512,
         "nome": "Frosinone",
         "escudo": "https://media.api-sports.io/football/teams/512.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1550104,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "dataHora": "2026-08-29T16:30:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "casa": {
+        "id": 1579,
         "nome": "Monza",
         "escudo": "https://media.api-sports.io/football/teams/1579.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 494,
         "nome": "Udinese",
         "escudo": "https://media.api-sports.io/football/teams/494.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1550106,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "dataHora": "2026-08-29T16:30:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "casa": {
+        "id": 488,
         "nome": "Sassuolo",
         "escudo": "https://media.api-sports.io/football/teams/488.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 503,
         "nome": "Torino",
         "escudo": "https://media.api-sports.io/football/teams/503.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1557386,
-      "competicao": "Premier League",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "dataHora": "2026-08-29T16:30:00+00:00",
       "status": "NS",
+      "competicao": "Premier League",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/39.png",
       "casa": {
+        "id": 47,
         "nome": "Tottenham",
         "escudo": "https://media.api-sports.io/football/teams/47.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 34,
         "nome": "Newcastle",
         "escudo": "https://media.api-sports.io/football/teams/34.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1575142,
-      "competicao": "Bundesliga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "dataHora": "2026-08-29T16:30:00+00:00",
       "status": "NS",
+      "competicao": "Bundesliga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/78.png",
       "casa": {
+        "id": 165,
         "nome": "Borussia Dortmund",
         "escudo": "https://media.api-sports.io/football/teams/165.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 175,
         "nome": "Hamburger SV",
         "escudo": "https://media.api-sports.io/football/teams/175.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1570361,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-29T17:00:00+00:00",
       "status": "NS",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 548,
         "nome": "Real Sociedad",
         "escudo": "https://media.api-sports.io/football/teams/548.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 540,
         "nome": "Espanyol",
         "escudo": "https://media.api-sports.io/football/teams/540.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1550101,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "dataHora": "2026-08-29T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/135.png",
       "casa": {
+        "id": 496,
         "nome": "Juventus",
         "escudo": "https://media.api-sports.io/football/teams/496.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 523,
         "nome": "Parma",
         "escudo": "https://media.api-sports.io/football/teams/523.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1552738,
-      "competicao": "Ligue 1",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "dataHora": "2026-08-29T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Ligue 1",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "casa": {
+        "id": 108,
         "nome": "Auxerre",
         "escudo": "https://media.api-sports.io/football/teams/108.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 77,
         "nome": "Angers",
         "escudo": "https://media.api-sports.io/football/teams/77.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1552739,
-      "competicao": "Ligue 1",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "dataHora": "2026-08-29T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Ligue 1",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "casa": {
+        "id": 106,
         "nome": "Stade Brestois 29",
         "escudo": "https://media.api-sports.io/football/teams/106.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 96,
         "nome": "Toulouse",
         "escudo": "https://media.api-sports.io/football/teams/96.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1552740,
-      "competicao": "Ligue 1",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "dataHora": "2026-08-29T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Ligue 1",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "casa": {
+        "id": 97,
         "nome": "Lorient",
         "escudo": "https://media.api-sports.io/football/teams/97.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 110,
         "nome": "Estac Troyes",
         "escudo": "https://media.api-sports.io/football/teams/110.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1552741,
-      "competicao": "Ligue 1",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "dataHora": "2026-08-29T18:45:00+00:00",
       "status": "NS",
+      "competicao": "Ligue 1",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/61.png",
       "casa": {
+        "id": 80,
         "nome": "Lyon",
         "escudo": "https://media.api-sports.io/football/teams/80.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 111,
         "nome": "Le Havre",
         "escudo": "https://media.api-sports.io/football/teams/111.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1570362,
-      "competicao": "La Liga",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "dataHora": "2026-08-29T19:30:00+00:00",
       "status": "NS",
+      "competicao": "La Liga",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/140.png",
       "casa": {
+        "id": 536,
         "nome": "Sevilla",
         "escudo": "https://media.api-sports.io/football/teams/536.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 530,
         "nome": "Atletico Madrid",
         "escudo": "https://media.api-sports.io/football/teams/530.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1492351,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/71.png",
       "dataHora": "2026-08-29T21:30:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/71.png",
       "casa": {
+        "id": 1062,
         "nome": "Atletico-MG",
         "escudo": "https://media.api-sports.io/football/teams/1062.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 136,
         "nome": "Vitoria",
         "escudo": "https://media.api-sports.io/football/teams/136.png",
-        "placar": null
+        "placar": ""
       }
     },
     {
       "id": 1492358,
-      "competicao": "Serie A",
-      "competicaoLogo": "https://media.api-sports.io/football/leagues/71.png",
       "dataHora": "2026-08-29T23:00:00+00:00",
       "status": "NS",
+      "competicao": "Serie A",
+      "competicaoLogo": "https://media.api-sports.io/football/leagues/71.png",
       "casa": {
+        "id": 126,
         "nome": "Sao Paulo",
         "escudo": "https://media.api-sports.io/football/teams/126.png",
-        "placar": null
+        "placar": ""
       },
       "fora": {
+        "id": 794,
         "nome": "RB Bragantino",
         "escudo": "https://media.api-sports.io/football/teams/794.png",
-        "placar": null
+        "placar": ""
       }
     }
   ]
