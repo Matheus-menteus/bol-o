@@ -42,22 +42,27 @@ async function main() {
       // Filtra apenas os jogos das ligas que nós queremos
       const jogosFiltrados = matches.filter(m => LIGAS.includes(m.league.id));
 
-      const jogosLimpos = jogosFiltrados.map((m) => ({
-        id: m.fixture.id,
-        competicao: m.league.name,
-        competicaoLogo: m.league.logo,
-        dataHora: m.fixture.date,
-        status: m.fixture.status.short, // FT, NS, 1H, HT...
-        casa: {
-          nome: m.teams.home.name,
-          escudo: m.teams.home.logo,
-          placar: m.goals.home
-        },
-        fora: {
-          nome: m.teams.away.name,
-          escudo: m.teams.away.logo,
-          placar: m.goals.away
-        }
+// Dentro do seu arquivo gerar-vitrine.mjs, atualize a extração dos dados:
+const jogoSimplificado = {
+    id: f.fixture.id,
+    dataHora: f.fixture.date,
+    status: f.fixture.status.short, // Aqui ele pega se é FT (Encerrado) ou NS (A iniciar)
+    competicao: f.league.name,
+    competicaoLogo: f.league.logo,
+    casa: {
+        id: f.teams.home.id,
+        nome: f.teams.home.name,
+        escudo: f.teams.home.logo,
+        // Puxa o gol se existir, senão deixa vazio
+        placar: f.goals.home !== null ? f.goals.home : "" 
+    },
+    fora: {
+        id: f.teams.away.id,
+        nome: f.teams.away.name,
+        escudo: f.teams.away.logo,
+        placar: f.goals.away !== null ? f.goals.away : ""
+    }
+};
       }));
 
       todosOsJogos.push(...jogosLimpos);
