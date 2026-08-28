@@ -19,7 +19,7 @@ body {
 }
 body::before {
   content:""; position:fixed; inset:0; z-index:-2;
-  background-image:url('https://images.unsplash.com/photo-1518605368461-1e1e38ce8058?q=80&w=1000&auto=format&fit=crop'); /* Fundo genérico de gramado */
+  background-image:url('https://images.unsplash.com/photo-1518605368461-1e1e38ce8058?q=80&w=1000&auto=format&fit=crop'); 
   background-size:cover; background-position:center; opacity: 0.15;
 }
 
@@ -38,10 +38,18 @@ h1 .thin { display:block; font-size:13px; font-weight:600; letter-spacing:.16em;
 }
 .filtros button.active { background:var(--teal); color:#fff; border-color:var(--teal); }
 
-.day { display:flex; align-items:center; gap:10px; margin:18px 2px 10px; }
+/* Remove a setinha nativa feia do HTML do <summary> */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+
+.day { display:flex; align-items:center; gap:10px; margin:18px 2px 10px; outline: none; cursor: pointer; }
 .day .dot { width:7px; height:7px; border-radius:99px; background:var(--gold); }
 .day .d { color:#fff; font-weight:800; font-size:13px; letter-spacing:.05em; text-transform:uppercase; }
 .day .line { flex:1; height:1px; background:rgba(255,255,255,.16); }
+
+/* Quando o accordion está fechado, a setinha vira pra direita. Quando aberto, pra baixo. */
+details[open] summary .seta { transform: rotate(0deg); }
+summary .seta { display: inline-block; transition: transform 0.2s; transform: rotate(-90deg); margin-left: 5px; color: var(--gold); }
 
 /* Cards de Jogo */
 .match {
@@ -60,7 +68,7 @@ h1 .thin { display:block; font-size:13px; font-weight:600; letter-spacing:.16em;
 
 .teams { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:6px; }
 .team { display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
-.team img { width: 36px; height: 36px; object-fit: contain; } /* Escudos via API */
+.team img { width: 36px; height: 36px; object-fit: contain; } 
 .team .nm { font-size:13px; font-weight:700; line-height:1.15; }
 
 .vs { font-size:12px; font-weight:800; color:var(--muted); }
@@ -104,9 +112,9 @@ h1 .thin { display:block; font-size:13px; font-weight:600; letter-spacing:.16em;
   <!-- TELA INICIAL: VITRINE DE JOGOS -->
   <div id="view-vitrine" class="view active">
     <div class="filtros" id="filtros">
-      <button data-dia="todos" class="active">Todos</button>
+      <button data-dia="todos">Todos</button>
       <button data-dia="ontem">Ontem</button>
-      <button data-dia="hoje">Hoje</button>
+      <button data-dia="hoje" class="active">Hoje</button> <!-- Agora 'Hoje' é a aba padrão ativa visualmente -->
       <button data-dia="amanha">Amanhã</button>
     </div>
     <div id="lista-jogos"><div class="loading">Buscando agenda de jogos...</div></div>
@@ -168,11 +176,7 @@ const formatarHora = (isoStr) => {
 };
 const pegarDataLocal = (isoStr) => new Date(isoStr).toLocaleDateString('pt-BR');
 
-// -------------------------------------------------------------
-// NOVO: SALVAR NO PEN DRIVE DO NAVEGADOR (LocalStorage)
-// -------------------------------------------------------------
 function salvarMemoriaNoNavegador() {
-  // Converte nossa memória global em texto e salva no navegador
   localStorage.setItem('futebolHubMemoria', JSON.stringify(jogosGlobal));
 }
 
@@ -183,16 +187,13 @@ async function carregarVitrine() {
     if (!res.ok) throw new Error("Sem vitrine");
     let data = await res.json();
     
-    // --- NOVO: LENDO A MEMÓRIA DO NAVEGADOR ---
     const memoriaSalva = localStorage.getItem('futebolHubMemoria');
     if (memoriaSalva) {
         const memoriaParseada = JSON.parse(memoriaSalva);
         
-        // Vamos varrer os jogos do GitHub e injetar os dados salvos do navegador neles
         data.jogos = data.jogos.map(jogoNovo => {
             const jogoLembrado = memoriaParseada.find(j => String(j.id) === String(jogoNovo.id));
             if (jogoLembrado) {
-                // Se a gente lembra desse jogo, restaura o placar, status e a IA gerada!
                 if (jogoLembrado.status) jogoNovo.status = jogoLembrado.status;
                 if (jogoLembrado.casa?.placar !== undefined) jogoNovo.casa.placar = jogoLembrado.casa.placar;
                 if (jogoLembrado.fora?.placar !== undefined) jogoNovo.fora.placar = jogoLembrado.fora.placar;
@@ -201,17 +202,17 @@ async function carregarVitrine() {
             return jogoNovo;
         });
     }
-    // ------------------------------------------
 
     jogosGlobal = data.jogos;
-    renderizarJogos("todos");
+    // INICIALIZA A TELA DIRETAMENTE NA ABA "HOJE"
+    renderizarJogos("hoje"); 
   } catch (error) {
     document.getElementById('lista-jogos').innerHTML = 
       `<div class="loading" style="color:var(--gold);">Agenda ainda não gerada ou erro ao carregar.<br>Verifique o GitHub Actions!</div>`;
   }
 }
 
-// Renderiza a Vitrine
+// NOVO: Renderiza a Vitrine COM SANFONAS (Accordion)
 function renderizarJogos(filtroDia) {
   const container = document.getElementById('lista-jogos');
   container.innerHTML = "";
@@ -221,8 +222,6 @@ function renderizarJogos(filtroDia) {
   const ontemStr = ontem.toLocaleDateString('pt-BR');
   let amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
   const amanhaStr = amanha.toLocaleDateString('pt-BR');
-
-  let dataAtual = "";
 
   const jogosFiltrados = jogosGlobal.filter(j => {
     const dataJogo = pegarDataLocal(j.dataHora);
@@ -237,45 +236,62 @@ function renderizarJogos(filtroDia) {
     return;
   }
 
+  // Agrupa os jogos por dia
+  const jogosPorDia = {};
   jogosFiltrados.forEach(j => {
     const dataJogo = formatarData(j.dataHora);
-    if (dataJogo !== dataAtual) {
-      container.innerHTML += `<div class="day"><span class="dot"></span><span class="d">${dataJogo}</span><span class="line"></span></div>`;
-      dataAtual = dataJogo;
-    }
-
-    let stHtml = `<span class="st pend">A iniciar</span>`;
-    let scoreHtml = `<div class="score pend">${formatarHora(j.dataHora)}</div>`;
-    
-    if (['1H', '2H', 'HT', 'ET', 'P', 'BT', 'LIVE'].includes(j.status)) {
-      stHtml = `<span class="st live">Ao Vivo</span>`;
-      scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
-    } else if (['FT', 'AET', 'PEN'].includes(j.status)) {
-      stHtml = `<span class="st enc">Encerrado</span>`;
-      scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
-    }
-
-    const card = `
-      <div class="match" onclick="abrirJogo('${j.id}')">
-        <div class="match-top">
-          <span class="grp"><img src="${j.competicaoLogo}" alt=""> ${j.competicao}</span>
-          ${stHtml}
-        </div>
-        <div class="teams">
-          <div class="team">
-            <img src="${j.casa.escudo}" alt="${j.casa.nome}">
-            <span class="nm">${j.casa.nome}</span>
-          </div>
-          ${scoreHtml}
-          <div class="team">
-            <img src="${j.fora.escudo}" alt="${j.fora.nome}">
-            <span class="nm">${j.fora.nome}</span>
-          </div>
-        </div>
-      </div>
-    `;
-    container.innerHTML += card;
+    if (!jogosPorDia[dataJogo]) jogosPorDia[dataJogo] = [];
+    jogosPorDia[dataJogo].push(j);
   });
+
+  // Renderiza cada grupo de dia como um <details> (Sanfona)
+  for (const [dia, jogos] of Object.entries(jogosPorDia)) {
+    // A tag <details open> faz a sanfona já nascer aberta
+    let htmlGrupo = `
+      <details open style="margin-bottom: 10px;">
+        <summary class="day">
+           <span class="dot"></span><span class="d">${dia} <span class="seta">▼</span></span><span class="line"></span>
+        </summary>
+        <div style="padding-top: 5px;">
+    `;
+
+    jogos.forEach(j => {
+      let stHtml = `<span class="st pend">A iniciar</span>`;
+      let scoreHtml = `<div class="score pend">${formatarHora(j.dataHora)}</div>`;
+      
+      if (['1H', '2H', 'HT', 'ET', 'P', 'BT', 'LIVE'].includes(j.status)) {
+        stHtml = `<span class="st live">Ao Vivo</span>`;
+        scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
+      } else if (['FT', 'AET', 'PEN'].includes(j.status)) {
+        stHtml = `<span class="st enc">Encerrado</span>`;
+        // NOVO: Agora exibe os placares finais se existirem, senão 0-0
+        scoreHtml = `<div class="score">${j.casa.placar !== "" ? j.casa.placar : 0}<span>-</span>${j.fora.placar !== "" ? j.fora.placar : 0}</div>`;
+      }
+
+      htmlGrupo += `
+        <div class="match" onclick="abrirJogo('${j.id}')">
+          <div class="match-top">
+            <span class="grp"><img src="${j.competicaoLogo}" alt=""> ${j.competicao}</span>
+            ${stHtml}
+          </div>
+          <div class="teams">
+            <div class="team">
+              <img src="${j.casa.escudo}" alt="${j.casa.nome}">
+              <span class="nm">${j.casa.nome}</span>
+            </div>
+            ${scoreHtml}
+            <div class="team">
+              <img src="${j.fora.escudo}" alt="${j.fora.nome}">
+              <span class="nm">${j.fora.nome}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    htmlGrupo += `</div></details>`;
+    container.innerHTML += htmlGrupo;
+  }
 }
 
 // Navegação SPA
@@ -337,16 +353,14 @@ function buscarEstatisticas(id) {
        const liga = data.liveStats.league;
        const eventos = data.liveStats.events || []; 
        
-       // --- ATUALIZA A MEMÓRIA E SALVA NO NAVEGADOR ---
        const indexJogo = jogosGlobal.findIndex(j => String(j.id) === String(id));
        if (indexJogo !== -1) {
            jogosGlobal[indexJogo].status = fix.status.short;
            jogosGlobal[indexJogo].casa.placar = gols.home ?? 0;
            jogosGlobal[indexJogo].fora.placar = gols.away ?? 0;
            
-           salvarMemoriaNoNavegador(); // Chama nossa nova função de backup!
+           salvarMemoriaNoNavegador();
        }
-       // ----------------------------------------------
 
        let statusTempo = fix.status.short;
        if (fix.status.elapsed && ['1H', '2H', 'HT', 'ET', 'LIVE'].includes(fix.status.short)) {
@@ -498,7 +512,7 @@ function buscarIA(id) {
        if (index !== -1) {
            jogosGlobal[index].iaCache = { panorama: data.panorama, insights: data.insights };
            
-           salvarMemoriaNoNavegador(); // Salva a IA no Pen Drive invisível!
+           salvarMemoriaNoNavegador();
        }
        
        renderizarIA(data.panorama, data.insights, id);
