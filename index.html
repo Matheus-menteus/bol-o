@@ -114,7 +114,7 @@ summary .seta { display: inline-block; transition: transform 0.2s; transform: ro
     <div class="filtros" id="filtros">
       <button data-dia="todos">Todos</button>
       <button data-dia="ontem">Ontem</button>
-      <button data-dia="hoje" class="active">Hoje</button> <!-- Agora 'Hoje' é a aba padrão ativa visualmente -->
+      <button data-dia="hoje" class="active">Hoje</button>
       <button data-dia="amanha">Amanhã</button>
     </div>
     <div id="lista-jogos"><div class="loading">Buscando agenda de jogos...</div></div>
@@ -164,8 +164,8 @@ summary .seta { display: inline-block; transition: transform 0.2s; transform: ro
 let jogosGlobal = [];
 let iaCarregada = false;
 let jogoAtualId = null;
+let timesFavoritos = JSON.parse(localStorage.getItem('futebolHubFavoritos') || '[]');
 
-// Funções Utilitárias de Data
 const formatarData = (isoStr) => {
   const d = new Date(isoStr);
   return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '');
@@ -180,7 +180,17 @@ function salvarMemoriaNoNavegador() {
   localStorage.setItem('futebolHubMemoria', JSON.stringify(jogosGlobal));
 }
 
-// Carrega os dados da Vitrine + Memória Local
+// Função para Favoritar/Desfavoritar Times
+function toggleFavorito(id) {
+  if (timesFavoritos.includes(id)) {
+      timesFavoritos = timesFavoritos.filter(t => t !== id);
+  } else {
+      timesFavoritos.push(id);
+  }
+  localStorage.setItem('futebolHubFavoritos', JSON.stringify(timesFavoritos));
+  if(jogoAtualId) abrirJogo(jogoAtualId); // Atualiza a estrela imediatamente
+}
+
 async function carregarVitrine() {
   try {
     const res = await fetch(`dados/vitrine.json?v=${Date.now()}`);
@@ -190,13 +200,16 @@ async function carregarVitrine() {
     const memoriaSalva = localStorage.getItem('futebolHubMemoria');
     if (memoriaSalva) {
         const memoriaParseada = JSON.parse(memoriaSalva);
-        
         data.jogos = data.jogos.map(jogoNovo => {
             const jogoLembrado = memoriaParseada.find(j => String(j.id) === String(jogoNovo.id));
             if (jogoLembrado) {
-                if (jogoLembrado.status) jogoNovo.status = jogoLembrado.status;
-                if (jogoLembrado.casa?.placar !== undefined) jogoNovo.casa.placar = jogoLembrado.casa.placar;
-                if (jogoLembrado.fora?.placar !== undefined) jogoNovo.fora.placar = jogoLembrado.fora.placar;
+                // CORREÇÃO: O Cache SÓ sobrescreve se o jogoNovo não for um jogo Encerrado.
+                const statusFinais = ['FT', 'AET', 'PEN'];
+                if (!statusFinais.includes(jogoNovo.status)) {
+                    if (jogoLembrado.status) jogoNovo.status = jogoLembrado.status;
+                    if (jogoLembrado.casa?.placar !== undefined) jogoNovo.casa.placar = jogoLembrado.casa.placar;
+                    if (jogoLembrado.fora?.placar !== undefined) jogoNovo.fora.placar = jogoLembrado.fora.placar;
+                }
                 if (jogoLembrado.iaCache) jogoNovo.iaCache = jogoLembrado.iaCache;
             }
             return jogoNovo;
@@ -204,15 +217,13 @@ async function carregarVitrine() {
     }
 
     jogosGlobal = data.jogos;
-    // INICIALIZA A TELA DIRETAMENTE NA ABA "HOJE"
     renderizarJogos("hoje"); 
   } catch (error) {
     document.getElementById('lista-jogos').innerHTML = 
-      `<div class="loading" style="color:var(--gold);">Agenda ainda não gerada ou erro ao carregar.<br>Verifique o GitHub Actions!</div>`;
+      `<div class="loading" style="color:var(--gold);">Agenda ainda não gerada ou erro ao carregar.</div>`;
   }
 }
 
-// NOVO: Renderiza a Vitrine COM SANFONAS (Accordion)
 function renderizarJogos(filtroDia) {
   const container = document.getElementById('lista-jogos');
   container.innerHTML = "";
@@ -236,7 +247,6 @@ function renderizarJogos(filtroDia) {
     return;
   }
 
-  // Agrupa os jogos por dia
   const jogosPorDia = {};
   jogosFiltrados.forEach(j => {
     const dataJogo = formatarData(j.dataHora);
@@ -244,9 +254,17 @@ function renderizarJogos(filtroDia) {
     jogosPorDia[dataJogo].push(j);
   });
 
-  // Renderiza cada grupo de dia como um <details> (Sanfona)
-  for (const [dia, jogos] of Object.entries(jogosPorDia)) {
-    // A tag <details open> faz a sanfona já nascer aberta
+  for (const [dia, jogosDoDia] of Object.entries(jogosPorDia)) {
+    
+    // ORDENAÇÃO: Jogos de Times Favoritos vão para o TOPO do dia
+    jogosDoDia.sort((a, b) => {
+       const aFav = timesFavoritos.includes(a.casa.id) || timesFavoritos.includes(a.fora.id);
+       const bFav = timesFavoritos.includes(b.casa.id) || timesFavoritos.includes(b.fora.id);
+       if (aFav && !bFav) return -1;
+       if (!aFav && bFav) return 1;
+       return 0; 
+    });
+
     let htmlGrupo = `
       <details open style="margin-bottom: 10px;">
         <summary class="day">
@@ -255,7 +273,7 @@ function renderizarJogos(filtroDia) {
         <div style="padding-top: 5px;">
     `;
 
-    jogos.forEach(j => {
+    jogosDoDia.forEach(j => {
       let stHtml = `<span class="st pend">A iniciar</span>`;
       let scoreHtml = `<div class="score pend">${formatarHora(j.dataHora)}</div>`;
       
@@ -264,12 +282,17 @@ function renderizarJogos(filtroDia) {
         scoreHtml = `<div class="score">${j.casa.placar}<span>-</span>${j.fora.placar}</div>`;
       } else if (['FT', 'AET', 'PEN'].includes(j.status)) {
         stHtml = `<span class="st enc">Encerrado</span>`;
-        // NOVO: Agora exibe os placares finais se existirem, senão 0-0
         scoreHtml = `<div class="score">${j.casa.placar !== "" ? j.casa.placar : 0}<span>-</span>${j.fora.placar !== "" ? j.fora.placar : 0}</div>`;
       }
 
+      const isFavCasa = timesFavoritos.includes(j.casa.id);
+      const isFavFora = timesFavoritos.includes(j.fora.id);
+      const cardStyle = (isFavCasa || isFavFora) ? 'border: 1px solid var(--gold); background: #FDFBF5;' : '';
+      const iconeFavCasa = isFavCasa ? '<span style="color:var(--gold);">★</span>' : '';
+      const iconeFavFora = isFavFora ? '<span style="color:var(--gold);">★</span>' : '';
+
       htmlGrupo += `
-        <div class="match" onclick="abrirJogo('${j.id}')">
+        <div class="match" style="${cardStyle}" onclick="abrirJogo('${j.id}')">
           <div class="match-top">
             <span class="grp"><img src="${j.competicaoLogo}" alt=""> ${j.competicao}</span>
             ${stHtml}
@@ -277,12 +300,12 @@ function renderizarJogos(filtroDia) {
           <div class="teams">
             <div class="team">
               <img src="${j.casa.escudo}" alt="${j.casa.nome}">
-              <span class="nm">${j.casa.nome}</span>
+              <span class="nm">${iconeFavCasa} ${j.casa.nome}</span>
             </div>
             ${scoreHtml}
             <div class="team">
               <img src="${j.fora.escudo}" alt="${j.fora.nome}">
-              <span class="nm">${j.fora.nome}</span>
+              <span class="nm">${iconeFavFora} ${j.fora.nome}</span>
             </div>
           </div>
         </div>
@@ -294,7 +317,6 @@ function renderizarJogos(filtroDia) {
   }
 }
 
-// Navegação SPA
 function abrirJogo(id) {
   const jogo = jogosGlobal.find(j => String(j.id) === String(id));
   if (!jogo) return;
@@ -307,8 +329,12 @@ function abrirJogo(id) {
   window.scrollTo({top: 0, behavior: 'smooth'});
 
   let scoreText = ['FT', 'AET', 'PEN', '1H', 'HT', '2H', 'ET', 'LIVE'].includes(jogo.status) 
-    ? `${jogo.casa.placar} - ${jogo.fora.placar}` 
+    ? `${jogo.casa.placar !== "" ? jogo.casa.placar : 0} - ${jogo.fora.placar !== "" ? jogo.fora.placar : 0}` 
     : formatarHora(jogo.dataHora);
+
+  // Estrelas Clicáveis no Cabeçalho
+  const starCasa = timesFavoritos.includes(jogo.casa.id) ? `<span style="color:var(--gold); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${jogo.casa.id})">★</span>` : `<span style="color:var(--muted); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${jogo.casa.id})">☆</span>`;
+  const starFora = timesFavoritos.includes(jogo.fora.id) ? `<span style="color:var(--gold); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${jogo.fora.id})">★</span>` : `<span style="color:var(--muted); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${jogo.fora.id})">☆</span>`;
 
   document.getElementById('partida-header').innerHTML = `
     <div class="match" style="cursor: default; transform: none; box-shadow: none;">
@@ -316,9 +342,9 @@ function abrirJogo(id) {
           ${jogo.competicao} · Carregando...
        </div>
        <div class="teams">
-          <div class="team"><img src="${jogo.casa.escudo}"><span class="nm">${jogo.casa.nome}</span></div>
+          <div class="team"><img src="${jogo.casa.escudo}"><span class="nm">${starCasa} ${jogo.casa.nome}</span></div>
           <div class="score">${scoreText}</div>
-          <div class="team"><img src="${jogo.fora.escudo}"><span class="nm">${jogo.fora.nome}</span></div>
+          <div class="team"><img src="${jogo.fora.escudo}"><span class="nm">${starFora} ${jogo.fora.nome}</span></div>
         </div>
     </div>
   `;
@@ -334,7 +360,6 @@ function abrirJogo(id) {
   buscarEstatisticas(id);
 }
 
-// Busca Estatísticas
 function buscarEstatisticas(id) {
   const container = document.getElementById('conteudo-live');
   container.innerHTML = '<div class="loading">Buscando dados em tempo real... ⏳</div>';
@@ -358,7 +383,6 @@ function buscarEstatisticas(id) {
            jogosGlobal[indexJogo].status = fix.status.short;
            jogosGlobal[indexJogo].casa.placar = gols.home ?? 0;
            jogosGlobal[indexJogo].fora.placar = gols.away ?? 0;
-           
            salvarMemoriaNoNavegador();
        }
 
@@ -371,15 +395,19 @@ function buscarEstatisticas(id) {
            statusTempo = formatarHora(fix.date);
        }
 
+       // Estrelas Clicáveis na atualização ao vivo
+       const starCasa = timesFavoritos.includes(data.liveStats.teams.home.id) ? `<span style="color:var(--gold); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${data.liveStats.teams.home.id})">★</span>` : `<span style="color:var(--muted); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${data.liveStats.teams.home.id})">☆</span>`;
+       const starFora = timesFavoritos.includes(data.liveStats.teams.away.id) ? `<span style="color:var(--gold); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${data.liveStats.teams.away.id})">★</span>` : `<span style="color:var(--muted); cursor:pointer; font-size:16px;" onclick="toggleFavorito(${data.liveStats.teams.away.id})">☆</span>`;
+
        document.getElementById('partida-header').innerHTML = `
          <div class="match" style="cursor: default; transform: none; box-shadow: none;">
             <div style="text-align:center; font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 10px;">
                ${liga.name} · ${statusTempo}
             </div>
             <div class="teams">
-               <div class="team"><img src="${data.liveStats.teams.home.logo}"><span class="nm">${data.liveStats.teams.home.name}</span></div>
+               <div class="team"><img src="${data.liveStats.teams.home.logo}"><span class="nm">${starCasa} ${data.liveStats.teams.home.name}</span></div>
                <div class="score">${gols.home ?? 0}<span>-</span>${gols.away ?? 0}</div>
-               <div class="team"><img src="${data.liveStats.teams.away.logo}"><span class="nm">${data.liveStats.teams.away.name}</span></div>
+               <div class="team"><img src="${data.liveStats.teams.away.logo}"><span class="nm">${starFora} ${data.liveStats.teams.away.name}</span></div>
              </div>
          </div>
        `;
@@ -511,10 +539,8 @@ function buscarIA(id) {
        const index = jogosGlobal.findIndex(j => String(j.id) === String(id));
        if (index !== -1) {
            jogosGlobal[index].iaCache = { panorama: data.panorama, insights: data.insights };
-           
            salvarMemoriaNoNavegador();
        }
-       
        renderizarIA(data.panorama, data.insights, id);
     })
     .catch(err => {
@@ -551,9 +577,7 @@ document.querySelectorAll('#tabs-partida button').forEach(btn => {
     document.getElementById(`tab-${tabClicada}`).classList.add('active');
 
     if ((tabClicada === 'panorama' || tabClicada === 'insights') && !iaCarregada) {
-       
        const jogo = jogosGlobal.find(j => String(j.id) === String(jogoAtualId));
-       
        if (jogo && jogo.iaCache) {
            renderizarIA(jogo.iaCache.panorama, jogo.iaCache.insights, jogoAtualId);
            iaCarregada = true;
